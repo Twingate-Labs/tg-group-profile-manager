@@ -1,0 +1,10 @@
+/.idea/
+/node_modules/
+/venv/
+/package-lock.json
+/tg policy management tool.iml
+/.env
+/.gitignore
+/Twingate Logo - Icon.png
+/README.md
+/manifest.yml
