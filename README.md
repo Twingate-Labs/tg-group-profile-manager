@@ -26,7 +26,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
      - groups: List of Twingate groups within the policy which the users can switch to
      - applicableToGroup: A Twingate group which the users within it can access the group policy
    - `DEPLOY_AS_DOCKER=true`
-4. Build Docker container `docker build . -t tg-group-policy_manager`
+4. Build Docker container `docker build . -t tg-group-policy-manager`
 5. Run Docker container `docker run -p 8080:8080 -d --name tg-group-policy-manager tg-group-policy-manager`
 6. Now you have the `tg-group-policy_manager` running
 

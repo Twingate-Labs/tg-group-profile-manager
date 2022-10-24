@@ -61,6 +61,7 @@ async function initApp(app) {
                 user_id: body.user.id,
                 "view": homeView
             });
+            logger.info(`User '${userEmail}' changed policy '${policyName}' to group '${selectedGroup}'`)
         }
         catch (error) {
             logger.error(error);
