@@ -54,6 +54,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 ```
     gcloud config set compute/zone europe-west2-a
     cd tg-group-policy-manager
+    sed -i 's/DEPLOY_AS_DOCKER=true/DEPLOY_AS_DOCKER=false/g' tg-group-policy-manager.conf
     export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
     gcloud services enable cloudbuild.googleapis.com
     gcloud builds submit --tag gcr.io/${PROJECT_ID}/tg-group-policy-manager .
