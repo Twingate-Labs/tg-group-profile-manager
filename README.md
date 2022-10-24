@@ -67,7 +67,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
     gcloud config set run/region europe-west2
     export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)' --filter 'NAME:Compute Engine default service account')
     gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/secretmanager.secretAccessor
-    gcloud run deploy tg-channel-merge --image gcr.io/${PROJECT_ID}/tg-channel-merge --set-env-vars PROJECT_ID=${PROJECT_ID}
+    gcloud run deploy tg-group-policy-manager --image gcr.io/${PROJECT_ID}/tg-group-policy-manager --set-env-vars PROJECT_ID=${PROJECT_ID}
 ```
 
 6. Select `Yes` to `Allow unauthenticated invocations to [tg-group-policy-manager]`
