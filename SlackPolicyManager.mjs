@@ -1,12 +1,24 @@
 import {TwingateApiClient} from './TwingateApiClient.mjs'
+import {accessSecretVersion} from "./utils.mjs";
+
+
 
 export class SlackPolicyManager {
     constructor () {
+    }
+
+    async init() {
         const applicationName = "tg-slack-policy-manager"
-        this.apiClient = new TwingateApiClient(process.env.TG_ACCOUNT, process.env.TG_API_KEY, {
+        let [tgAccount,tgApiKey] = [process.env.TG_ACCOUNT, process.env.TG_API_KEY]
+        if (process.env.DEPLOY_AS_DOCKER !== "true") {
+           tgAccount = await accessSecretVersion('tg-group-policy-manager-tg-account')
+           tgApiKey = await accessSecretVersion('tg-group-policy-manager-tg-api-key')
+        }
+        this.apiClient = new TwingateApiClient(tgAccount, tgApiKey, {
             applicationName
         });
     }
+
 
     // todo: only gets first 50 groups
     async lookupUserGroupByEmail(email) {
@@ -51,6 +63,7 @@ export class SlackPolicyManager {
         let groupsResponse = await this.apiClient.exec(groupQuery, {groupId, userIds} );
         return groupsResponse;
     }
+
 
 
 }

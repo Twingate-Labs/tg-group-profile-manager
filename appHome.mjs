@@ -5,17 +5,17 @@ export const createHome = async(policies, userEmail) => {
         // Note: iterate policies might be better solution here as it can flag the groups with the same name.
         // Note: though the method used below is using less API calls
         const policyManager = new SlackPolicyManager()
+        await policyManager.init()
         const userGroups = (await policyManager.lookupUserGroupByEmail(userEmail)).groups.edges.map(group => group.node)
         const permittedPolicies = policies.filter(policy => userGroups.map(group=>group.name).includes(policy.applicableToGroup))
 
         let view = {
-                // Home tabs must be enabled in your app configuration page under "App Home"
                 "type": "home",
                 "blocks": [{
                     type: "section",
                     text: {
                         type: "mrkdwn",
-                        text: "*Welcome!* \nThis is home for Twingate Policy Management Tool."
+                        text: "*Welcome!* \nThis is home for Twingate Group Policy Manager."
                     }
                 },
                 {
@@ -43,7 +43,7 @@ export const createHome = async(policies, userEmail) => {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": `*Policy: ${permittedPolicy.policyName}*\nCurrent Active Groups: ${currentActiveGroupsString}`
+                    "text": `*Policy: ${permittedPolicy.policyName}*\nCurrent Group: ${currentActiveGroupsString}`
                 },
                 "accessory": {
                     "type": "button",
@@ -51,7 +51,7 @@ export const createHome = async(policies, userEmail) => {
                     "text": {
                         "type": "plain_text",
                         "emoji": true,
-                        "text": "Change Active Groups"
+                        "text": "Change"
                     },
                     "value": `${permittedPolicy.policyName}++${userEmail}`
                 }
