@@ -54,10 +54,10 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 4. Enter the following commands to build the Docker image
 ```
     gcloud config set compute/zone europe-west2-a
-    cd slack-bot-ext-merge
+    cd tg-group-policy-manager
     export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
     gcloud services enable cloudbuild.googleapis.com
-    gcloud builds submit --tag gcr.io/${PROJECT_ID}/tg-channel-merge .
+    gcloud builds submit --tag gcr.io/${PROJECT_ID}/tg-group-policy-manager .
 ```
 
 5. Enter the following commands to deploy the app to Cloud Run
@@ -70,8 +70,8 @@ This project deploys a Slackbot which provide Twingate users to manage their own
     gcloud run deploy tg-channel-merge --image gcr.io/${PROJECT_ID}/tg-channel-merge --set-env-vars PROJECT_ID=${PROJECT_ID}
 ```
 
-6. Select `Yes` to `Allow unauthenticated invocations to [tg-channel-merge]`
-7. Copy out the URL of the Slack app, e.g. `https://slack-bot-ext-merge-xxxxx-nw.a.run.app`
+6. Select `Yes` to `Allow unauthenticated invocations to [tg-group-policy-manager]`
+7. Copy out the URL of the Slack app, e.g. `https://tg-group-policy-manager-xxxxx-nw.a.run.app`
 
 
 ### Finishing Setup in Slack App UI
