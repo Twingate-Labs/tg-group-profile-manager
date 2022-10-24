@@ -86,5 +86,4 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 
 
 ### Limitations
-1. Cannot auto joining the private channels, the bot has to be manually invited
-2. User will not be auto invited to the ext-all and ext-partner-all channels, they have to be manually invited
+1. 
