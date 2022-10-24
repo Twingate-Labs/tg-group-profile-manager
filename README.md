@@ -39,7 +39,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
     export SIGNING_SECRET={SLACK_SECRET}
     export TG_API_KEY={TWINGATE_API_KEY}
     export TG_ACCOUNT={TWINGATE_ADDRESS}
-    export POLICY_CONFIG={POLICY_CONFIG}
+    export POLICY_CONFIG='{POLICY_CONFIG}'
     gcloud services enable secretmanager.googleapis.com
     gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=user:$(gcloud auth list --format 'value(account)') --role=roles/secretmanager.admin
     echo -n $BOT_TOKEN | gcloud secrets create tg-group-policy-manager-bot-token --replication-policy=automatic --data-file=-
@@ -47,7 +47,6 @@ This project deploys a Slackbot which provide Twingate users to manage their own
     echo -n $TG_API_KEY | gcloud secrets create tg-group-policy-manager-tg-api-key --replication-policy=automatic --data-file=-
     echo -n $TG_ACCOUNT | gcloud secrets create tg-group-policy-manager-tg-account --replication-policy=automatic --data-file=-
     echo -n $POLICY_CONFIG | gcloud secrets create tg-group-policy-manager-policy-config --replication-policy=automatic --data-file=-
-
 ```
 
 
@@ -76,8 +75,6 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 
 ### Finishing Setup in Slack App UI
 1. Go to your app at [Slack App UI](https://api.slack.com/apps)
-2. Slack commands
-   * Replace the Request URL of all slash commands to `https://{Your tg-group-policy-manager Address}/slack/events`
 3. Event Subscription
    * Replace the Request URL to `https://{Your tg-group-policy-manager Address}/slack/events`
 * Interactivity & Shortcuts
