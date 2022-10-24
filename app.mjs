@@ -85,6 +85,13 @@ async function initApp(app) {
         ]
     }
 
+    console.log("----------")
+    console.log(process.env.DEPLOY_AS_DOCKER)
+    console.log(slackToken)
+    console.log(slackSigningSecrete)
+    console.log("----------")
+
+
     const app = new App({
         token: slackToken,
         signingSecret: slackSigningSecrete
