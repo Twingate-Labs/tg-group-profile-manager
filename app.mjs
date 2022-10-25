@@ -10,8 +10,13 @@ let policyConfig = JSON.parse(process.env.POLICY_CONFIG);
 async function initApp(app) {
     // fetching secrete from google cloud
     if (process.env.DEPLOY_AS_DOCKER !== "true") {
-        policyConfig = await accessSecretVersion('tg-group-policy-manager-policy-config')
+        policyConfig = JSON.parse(await accessSecretVersion('tg-group-policy-manager-policy-config'))
     }
+
+
+    console.log("----------")
+    console.log(policyConfig)
+    console.log("----------")
 
     // Listen for users opening your App Home
     app.event('app_home_opened', async ({ event, client, logger }) => {
@@ -85,11 +90,6 @@ async function initApp(app) {
         ]
     }
 
-    console.log("----------")
-    console.log(process.env.DEPLOY_AS_DOCKER)
-    console.log(slackToken)
-    console.log(slackSigningSecrete)
-    console.log("----------")
 
 
     const app = new App({
