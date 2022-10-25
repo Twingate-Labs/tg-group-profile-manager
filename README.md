@@ -72,7 +72,8 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 
 6. Select `Yes` to `Allow unauthenticated invocations to [tg-group-policy-manager]`
 7. Copy out the URL of the Slack app, e.g. `https://tg-group-policy-manager-xxxxx-nw.a.run.app`
-
+8. Configure Cloud Run
+   * 
 
 ### Finishing Setup in Slack App UI
 1. Go to your app at [Slack App UI](https://api.slack.com/apps)

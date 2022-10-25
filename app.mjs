@@ -13,11 +13,6 @@ async function initApp(app) {
         policyConfig = JSON.parse(await accessSecretVersion('tg-group-policy-manager-policy-config'))
     }
 
-
-    console.log("----------")
-    console.log(policyConfig)
-    console.log("----------")
-
     // Listen for users opening your App Home
     app.event('app_home_opened', async ({ event, client, logger }) => {
         try {

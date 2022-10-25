@@ -1,19 +1,20 @@
-import {TwingateApiClient} from './TwingateApiClient.mjs'
+import {TwingateApiClient} from './TwingateApiClient.mjs';
 import {accessSecretVersion} from "./utils.mjs";
+import dotenvPkg from 'dotenv';
+dotenvPkg.config();
 
-
+const applicationName = "tg-slack-policy-manager"
+let [tgAccount,tgApiKey] = [process.env.TG_ACCOUNT, process.env.TG_API_KEY]
+if (process.env.DEPLOY_AS_DOCKER !== "true") {
+    tgAccount = await accessSecretVersion('tg-group-policy-manager-tg-account')
+    tgApiKey = await accessSecretVersion('tg-group-policy-manager-tg-api-key')
+}
 
 export class SlackPolicyManager {
     constructor () {
     }
 
     async init() {
-        const applicationName = "tg-slack-policy-manager"
-        let [tgAccount,tgApiKey] = [process.env.TG_ACCOUNT, process.env.TG_API_KEY]
-        if (process.env.DEPLOY_AS_DOCKER !== "true") {
-           tgAccount = await accessSecretVersion('tg-group-policy-manager-tg-account')
-           tgApiKey = await accessSecretVersion('tg-group-policy-manager-tg-api-key')
-        }
         this.apiClient = new TwingateApiClient(tgAccount, tgApiKey, {
             applicationName
         });
