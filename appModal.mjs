@@ -83,9 +83,9 @@ export const submitChange = async (profileConfig, userEmail, profileName, select
                 GroupNameToIdMap[group] = groupId
                 if (userGroups.map(userGroup => userGroup.name).includes(group)) {
                     response = await profileManager.removeUserFromGroup(groupId, userId);
-                    console.log(`User '${userEmail}' in group '${group}', removing user from group.`)
+                    console.log(`User '${userEmail}' in profile '${profile.profileName}' group '${group}', removing user from group.`)
                 } else {
-                    console.log(`User '${userEmail}' not in group '${group}', skipping removal.`)
+                    console.log(`User '${userEmail}' not in profile '${profile.profileName}' group '${group}', skipping removal.`)
                 }
             }
             break;
@@ -100,20 +100,20 @@ export const submitChange = async (profileConfig, userEmail, profileName, select
                     const groupId = GroupNameToIdMap[group] || await profileManager.lookupGroupByName(group)
                     GroupNameToIdMap[group] = groupId
                     response = await profileManager.removeUserFromGroup(groupId, userId);
-                    console.log(`User '${userEmail}' in group '${group}', removing user from group.`)
+                    console.log(`User '${userEmail}' in profile '${profile.profileName}' group '${group}', removing user from group.`)
                 } else {
-                    console.log(`User '${userEmail}' not in group '${group}', skipping removal.`)
+                    console.log(`User '${userEmail}' not in profile '${profile.profileName}' group '${group}', skipping removal.`)
                 }
             }
 
             // add user to group
             if (userGroups.map(userGroup => userGroup.name).includes(groupToAdd)) {
-                console.log(`User '${userEmail}' in group '${groupToAdd}', skipping adding.`)
+                console.log(`User '${userEmail}' in profile '${profile.profileName}' group '${groupToAdd}', skipping adding.`)
             } else {
                 const groupId = GroupNameToIdMap[groupToAdd] || await profileManager.lookupGroupByName(groupToAdd)
                 GroupNameToIdMap[groupToAdd] = groupId
                 response = await profileManager.addUserToGroup(groupId, userId);
-                console.log(`User '${userEmail}' not in group '${groupToAdd}', adding user to group.`)
+                console.log(`User '${userEmail}' not in profile '${profile.profileName}' group '${groupToAdd}', adding user to group.`)
             }
 
     }
