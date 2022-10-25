@@ -3,7 +3,8 @@ import {accessSecretVersion} from "./utils.mjs";
 import dotenvPkg from 'dotenv';
 dotenvPkg.config();
 
-const applicationName = "tg-slack-policy-manager"
+//todo: centralise all accessSecretVersion
+const applicationName = "tg-group-policy-manager"
 let [tgAccount,tgApiKey] = [process.env.TG_ACCOUNT, process.env.TG_API_KEY]
 if (process.env.DEPLOY_AS_DOCKER !== "true") {
     tgAccount = await accessSecretVersion('tg-group-policy-manager-tg-account')

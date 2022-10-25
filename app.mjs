@@ -9,6 +9,7 @@ let policyConfig = JSON.parse(process.env.POLICY_CONFIG);
 
 async function initApp(app) {
     // fetching secrete from google cloud
+    //todo: centralise all accessSecretVersion
     if (process.env.DEPLOY_AS_DOCKER !== "true") {
         policyConfig = JSON.parse(await accessSecretVersion('tg-group-policy-manager-policy-config'))
     }
@@ -78,6 +79,7 @@ async function initApp(app) {
         process.env.SLACK_SIGNING_SECRET
     ]
     // fetching secrete from google cloud
+    //todo: centralise all accessSecretVersion
     if (process.env.DEPLOY_AS_DOCKER !== "true") {
         [slackToken, slackSigningSecrete] = [
             await accessSecretVersion('tg-group-policy-manager-bot-token'),
