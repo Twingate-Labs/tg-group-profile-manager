@@ -72,8 +72,9 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 
 6. Select `Yes` to `Allow unauthenticated invocations to [tg-group-policy-manager]`
 7. Copy out the URL of the Slack app, e.g. `https://tg-group-policy-manager-xxxxx-nw.a.run.app`
-8. Configure Cloud Run
-   * 
+8. (Optional) Configure Cloud Run
+   * The Cloud Run can take between 5-10 seconds to process the switch group requests with the default Cloud Run configuration
+   * [CPU is always allocated](https://cloud.google.com/run/docs/configuring/cpu-allocation#setting) can be enabled in Cloud Run to improve performance (to 1-2 seconds)
 
 ### Finishing Setup in Slack App UI
 1. Go to your app at [Slack App UI](https://api.slack.com/apps)
@@ -82,7 +83,3 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 * Interactivity & Shortcuts
    * Replace the Request URL to `https://{Your tg-group-policy-manager Address}/slack/events`
 4. Download the [Twingate Logo](https://github.com/Twingate-Labs/tg-group-policy-manager/blob/main/Twingate%20Logo%20-%20Icon.png) and change the logo of the Slack app at the Basic Info
-
-
-### Limitations
-1. 
