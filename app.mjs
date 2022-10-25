@@ -10,7 +10,7 @@ let profileConfig = JSON.parse(process.env.PROFILE_CONFIG);
 async function initApp(app) {
     // fetching secrete from google cloud
     //todo: centralise all accessSecretVersion
-    if (process.env.DEPLOY_AS_DOCKER !== "true") {
+    if (process.env.DEPLOY_ENV !== "docker") {
         profileConfig = JSON.parse(await accessSecretVersion('tg-group-profile-manager-profile-config'))
     }
 
@@ -80,7 +80,7 @@ async function initApp(app) {
     ]
     // fetching secrete from google cloud
     //todo: centralise all accessSecretVersion
-    if (process.env.DEPLOY_AS_DOCKER !== "true") {
+    if (process.env.DEPLOY_ENV !== "docker") {
         [slackToken, slackSigningSecrete] = [
             await accessSecretVersion('tg-group-profile-manager-bot-token'),
             await accessSecretVersion('tg-group-profile-manager-client-signing-secret')

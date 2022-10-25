@@ -25,7 +25,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
      - profileName: User friendly group profile name
      - groups: List of Twingate groups within the profile which the users can switch to
      - applicableToGroup: A Twingate group which the users within it can access the group profile
-   - `DEPLOY_AS_DOCKER=true`
+   - `DEPLOY_ENV=docker`
 4. Build Docker container `docker build . -t tg-group-profile-manager`
 5. Run Docker container `docker run -p 8080:8080 -d --name tg-group-profile-manager tg-group-profile-manager`
 6. Now you have the `tg-group-profile_manager` running
@@ -63,7 +63,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 ```
     gcloud config set compute/zone europe-west2-a
     cd tg-group-profile-manager
-    sed -i 's/DEPLOY_AS_DOCKER=true/DEPLOY_AS_DOCKER=false/g' tg-group-profile-manager.conf
+    sed -i 's/DEPLOY_ENV=docker/DEPLOY_ENV=cloudrun/g' tg-group-profile-manager.conf
     export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
     gcloud services enable cloudbuild.googleapis.com
     gcloud builds submit --tag gcr.io/${PROJECT_ID}/tg-group-profile-manager .
