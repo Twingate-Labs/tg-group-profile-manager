@@ -7,7 +7,7 @@ RUN npm install
 
 # Bundle app source.
 COPY . .
-COPY tg-group-policy-manager.conf ./.env
+COPY tg-group-profile-manager.conf ./.env
 CMD ["node", "app.mjs"]
 
 EXPOSE 8080

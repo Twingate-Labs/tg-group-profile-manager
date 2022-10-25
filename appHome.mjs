@@ -1,13 +1,15 @@
-import {SlackPolicyManager} from "./SlackPolicyManager.mjs"
+import {SlackProfileManager} from "./SlackProfileManager.mjs"
 
-export const createHome = async(policies, userEmail) => {
-    if(policies){
-        // Note: iterate policies might be better solution here as it can flag the groups with the same name.
+export const createHome = async(profileConfig, userEmail) => {
+    if(profileConfig.profiles){
+        // Note: iterate profiles might be better solution here as it can flag the groups with the same name.
         // Note: though the method used below is using less API calls
-        const policyManager = new SlackPolicyManager()
-        await policyManager.init()
-        const userGroups = (await policyManager.lookupUserGroupByEmail(userEmail)).groups.edges.map(group => group.node)
-        const permittedPolicies = policies.filter(policy => userGroups.map(group=>group.name).includes(policy.applicableToGroup))
+        const profileManager = new SlackProfileManager()
+        await profileManager.init()
+        const userWithGroups = await profileManager.lookupUserGroupByEmail(userEmail);
+        const userId = userWithGroups.id
+        const userGroups = userWithGroups.groups.edges.map(group => group.node)
+        const permittedProfiles = profileConfig.profiles.filter(profile => userGroups.map(group=>group.name).includes(profile.applicableToGroup))
 
         let view = {
                 "type": "home",
@@ -15,7 +17,7 @@ export const createHome = async(policies, userEmail) => {
                     type: "section",
                     text: {
                         type: "mrkdwn",
-                        text: "*Welcome!* \nThis is home for Twingate Group Policy Manager."
+                        text: "*Welcome!* \nThis is home for Twingate Group Profile Manager."
                     }
                 },
                 {
@@ -24,7 +26,7 @@ export const createHome = async(policies, userEmail) => {
                         {
                             type: "mrkdwn",
                             // todo: confirm the url is working
-                            text: "<https://github.com/Twingate-Labs/tg-policy-management-tool|GitHub> and <https://github.com/Twingate-Labs/tg-policy-management-tool/blob/main/README.md|User Guide>"
+                            text: "<https://github.com/Twingate-Labs/tg-profile-management-tool|GitHub> and <https://github.com/Twingate-Labs/tg-profile-management-tool/blob/main/README.md|User Guide>"
                         }
                     ]
                 }
@@ -33,8 +35,8 @@ export const createHome = async(policies, userEmail) => {
 
         const splitter = {type: "divider"}
 
-        for (const permittedPolicy of permittedPolicies){
-            const currentActiveGroups = permittedPolicy.groups.filter(group => userGroups.map(userGroup => userGroup.name).includes(group))
+        for (const permittedProfile of permittedProfiles){
+            const currentActiveGroups = permittedProfile.groups.filter(group => userGroups.map(userGroup => userGroup.name).includes(group))
             let currentActiveGroupsString = currentActiveGroups.join(", ")
             if (!currentActiveGroupsString) {
                 currentActiveGroupsString = "None"
@@ -43,17 +45,17 @@ export const createHome = async(policies, userEmail) => {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": `*Policy: ${permittedPolicy.policyName}*\nCurrent Group: ${currentActiveGroupsString}`
+                    "text": `*Profile: ${permittedProfile.profileName}*\nCurrent Group: ${currentActiveGroupsString}`
                 },
                 "accessory": {
                     "type": "button",
-                    "action_id": "select_policy",
+                    "action_id": "select_profile",
                     "text": {
                         "type": "plain_text",
                         "emoji": true,
                         "text": "Change"
                     },
-                    "value": `${permittedPolicy.policyName}++${userEmail}`
+                    "value": `${permittedProfile.profileName}++${userEmail}`
                 }
             }
             view.blocks.push(splitter)

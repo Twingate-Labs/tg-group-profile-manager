@@ -4,14 +4,14 @@ import dotenvPkg from 'dotenv';
 dotenvPkg.config();
 
 //todo: centralise all accessSecretVersion
-const applicationName = "tg-group-policy-manager"
+const applicationName = "tg-group-profile-manager"
 let [tgAccount,tgApiKey] = [process.env.TG_ACCOUNT, process.env.TG_API_KEY]
 if (process.env.DEPLOY_AS_DOCKER !== "true") {
-    tgAccount = await accessSecretVersion('tg-group-policy-manager-tg-account')
-    tgApiKey = await accessSecretVersion('tg-group-policy-manager-tg-api-key')
+    tgAccount = await accessSecretVersion('tg-group-profile-manager-tg-account')
+    tgApiKey = await accessSecretVersion('tg-group-profile-manager-tg-api-key')
 }
 
-export class SlackPolicyManager {
+export class SlackProfileManager {
     constructor () {
     }
 
@@ -65,7 +65,5 @@ export class SlackPolicyManager {
         let groupsResponse = await this.apiClient.exec(groupQuery, {groupId, userIds} );
         return groupsResponse;
     }
-
-
 
 }

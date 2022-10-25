@@ -5,20 +5,20 @@ import dotenvPkg from 'dotenv';
 import {accessSecretVersion} from "./utils.mjs";
 const {App} = boltPkg;
 dotenvPkg.config();
-let policyConfig = JSON.parse(process.env.POLICY_CONFIG);
+let profileConfig = JSON.parse(process.env.PROFILE_CONFIG);
 
 async function initApp(app) {
     // fetching secrete from google cloud
     //todo: centralise all accessSecretVersion
     if (process.env.DEPLOY_AS_DOCKER !== "true") {
-        policyConfig = JSON.parse(await accessSecretVersion('tg-group-policy-manager-policy-config'))
+        profileConfig = JSON.parse(await accessSecretVersion('tg-group-profile-manager-profile-config'))
     }
 
     // Listen for users opening your App Home
     app.event('app_home_opened', async ({ event, client, logger }) => {
         try {
             const slackUserInfo = await client.users.info({user: event.user});
-            const homeView = await createHome(policyConfig, slackUserInfo.user.profile.email);
+            const homeView = await createHome(profileConfig, slackUserInfo.user.profile.email);
             const result = await client.views.publish({
                 user_id: event.user,
                 "view": homeView
@@ -31,10 +31,10 @@ async function initApp(app) {
     });
 
 
-    app.action('select_policy', async ({ body, context, ack }) => {
+    app.action('select_profile', async ({ body, context, ack }) => {
         ack();
         try {
-            const view = await openModal(policyConfig, body.actions[0].value);
+            const view = await openModal(profileConfig, body.actions[0].value);
             const result = await app.client.views.open({
                 token: context.botToken,
                 trigger_id: body.trigger_id,
@@ -54,15 +54,15 @@ async function initApp(app) {
     app.view('submit_active_group_change', async ({ body, client, logger,context, ack }) => {
         ack();
         const selectedOption = Object.values(Object.values(body.view.state.values)[0])[0].selected_option;
-        const [policyName, selectedGroup, userEmail] = selectedOption.value.split("++");
+        const [profileName, selectedGroup, userEmail] = selectedOption.value.split("++");
         try {
-            await submitChange(policyConfig, userEmail, policyName, selectedGroup);
-            const homeView = await createHome(policyConfig, userEmail);
+            await submitChange(profileConfig, userEmail, profileName, selectedGroup);
+            const homeView = await createHome(profileConfig, userEmail);
             const result = await client.views.publish({
                 user_id: body.user.id,
                 "view": homeView
             });
-            logger.info(`User '${userEmail}' changed policy '${policyName}' to group '${selectedGroup}'`)
+            logger.info(`User '${userEmail}' changed profile '${profileName}' to group '${selectedGroup}'`)
         }
         catch (error) {
             logger.error(error);
@@ -82,8 +82,8 @@ async function initApp(app) {
     //todo: centralise all accessSecretVersion
     if (process.env.DEPLOY_AS_DOCKER !== "true") {
         [slackToken, slackSigningSecrete] = [
-            await accessSecretVersion('tg-group-policy-manager-bot-token'),
-            await accessSecretVersion('tg-group-policy-manager-client-signing-secret')
+            await accessSecretVersion('tg-group-profile-manager-bot-token'),
+            await accessSecretVersion('tg-group-profile-manager-client-signing-secret')
         ]
     }
 

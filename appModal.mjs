@@ -1,15 +1,15 @@
-import {SlackPolicyManager} from "./SlackPolicyManager.mjs";
+import {SlackProfileManager} from "./SlackProfileManager.mjs";
 
-export const openModal = async (policies, requestValue) => {
+export const openModal = async (profileConfig, requestValue) => {
     const [actionValue, userEmail] = requestValue.split("++")
-    const policy = policies.filter(policy => policy.policyName == actionValue)[0]
+    const profile = profileConfig.profiles.filter(profile => profile.profileName == actionValue)[0]
 
     let modal = {
         type: 'modal',
         callback_id: 'submit_active_group_change',
         title: {
             type: 'plain_text',
-            // Not making Policy Name Part of the title as the title has a maximum of 25 chars restriction
+            // Not making Profile Name Part of the title as the title has a maximum of 25 chars restriction
             text: `Change Your Group`
         },
         submit: {
@@ -31,27 +31,27 @@ export const openModal = async (policies, requestValue) => {
                             "type": "plain_text",
                             "text": "No Group",
                         },
-                        "value": `${policy.policyName}++no_group++${userEmail}`
+                        "value": `${profile.profileName}++no_group++${userEmail}`
                     }],
                     initial_option: {
                         "text": {
                             "type": "plain_text",
                             "text": "No Group",
                         },
-                        "value": `${policy.policyName}++no_group++${userEmail}`
+                        "value": `${profile.profileName}++no_group++${userEmail}`
                     }
                 }
             }
         ]
     }
 
-    for (const group of policy.groups) {
+    for (const group of profile.groups) {
         const option = {
             text: {
                 type: "plain_text",
                 text: group
             },
-            value: `${policy.policyName}++${group}++${userEmail}`
+            value: `${profile.profileName}++${group}++${userEmail}`
         }
 
         modal.blocks[0]["accessory"]["options"].push(option)
@@ -61,29 +61,60 @@ export const openModal = async (policies, requestValue) => {
     return modal;
 };
 
+const GroupNameToIdMap = {};
 
-export const submitChange = async (policies, userEmail, policyName, selectedGroup) => {
-    const policy = policies.filter(policy => policy.policyName == policyName)[0]
-    const policyManager = new SlackPolicyManager()
-    await policyManager.init()
-    const tgUserId = await policyManager.lookupUserByEmail(userEmail)
+export const submitChange = async (profileConfig, userEmail, profileName, selectedGroup) => {
+    const profile = profileConfig.profiles.filter(profile => profile.profileName == profileName)[0]
+    const profileManager = new SlackProfileManager()
+    await profileManager.init()
+    const userWithGroups = await profileManager.lookupUserGroupByEmail(userEmail);
+    const userId = userWithGroups.id
+    const userGroups = userWithGroups.groups.edges.map(group => group.node)
+    for (const group of userGroups){
+        GroupNameToIdMap[group.name] = group.id
+    }
+
+
     let response = ""
-
     switch (selectedGroup) {
         case "no_group":
-            for (const group of policy.groups) {
-                const tgGroupId = await policyManager.lookupGroupByName(group)
-                response = await policyManager.removeUserFromGroup(tgGroupId, tgUserId);
+            for (const group of profile.groups) {
+                const groupId = GroupNameToIdMap[group] || await profileManager.lookupGroupByName(group)
+                GroupNameToIdMap[group] = groupId
+                if (userGroups.map(userGroup => userGroup.name).includes(group)) {
+                    response = await profileManager.removeUserFromGroup(groupId, userId);
+                    console.log(`User '${userEmail}' in group '${group}', removing user from group.`)
+                } else {
+                    console.log(`User '${userEmail}' not in group '${group}', skipping removal.`)
+                }
             }
             break;
         default:
-            for (const group of policy.groups) {
-                const tgGroupId = await policyManager.lookupGroupByName(group)
-                if (selectedGroup !== group) {
-                    response = await policyManager.removeUserFromGroup(tgGroupId, tgUserId);
+            const groupToAdd = selectedGroup
+            const groupToRemove = profile.groups.filter(group => group!== selectedGroup)
+
+            // remove user from groups
+            for (const group of groupToRemove){
+
+                if (userGroups.map(userGroup => userGroup.name).includes(group)) {
+                    const groupId = GroupNameToIdMap[group] || await profileManager.lookupGroupByName(group)
+                    GroupNameToIdMap[group] = groupId
+                    response = await profileManager.removeUserFromGroup(groupId, userId);
+                    console.log(`User '${userEmail}' in group '${group}', removing user from group.`)
                 } else {
-                    response = await policyManager.addUserToGroup(tgGroupId, tgUserId);
+                    console.log(`User '${userEmail}' not in group '${group}', skipping removal.`)
                 }
             }
+
+            // add user to group
+            if (userGroups.map(userGroup => userGroup.name).includes(groupToAdd)) {
+                console.log(`User '${userEmail}' in group '${groupToAdd}', skipping adding.`)
+            } else {
+                const groupId = GroupNameToIdMap[groupToAdd] || await profileManager.lookupGroupByName(groupToAdd)
+                GroupNameToIdMap[groupToAdd] = groupId
+                response = await profileManager.addUserToGroup(groupId, userId);
+                console.log(`User '${userEmail}' not in group '${groupToAdd}', adding user to group.`)
+            }
+
     }
 };
