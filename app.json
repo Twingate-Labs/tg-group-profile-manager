@@ -25,6 +25,11 @@
             "description": "Profile configuration (must be valid JSON)",
             "required": true,
             "order": 50
+        },
+        "PROJECT_ID": {
+            "description": "GCP project Id (leave blank)",
+            "required": false,
+            "order": 60
         }
     },
     "options": {
