@@ -31,7 +31,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 6. Now you have the `tg-group-profile_manager` running
 
 ### (Option 2) Deploy as Google Cloud Run
-1. Open Google Cloud Shell
+1. Open Google [Cloud Shell](https://cloud.google.com/shell)
 2. Clone the project `git clone https://github.com/Twingate-Labs/tg-group-profile-manager.git`
 3. Setup Google Secrete Manager, replace `{SLACK_BOT_TOKEN}`, `{SLACK_SECRET}`, `{TWINGATE_API_KEY}`, `{TWINGATE_ADDRESS}` in the format of xxx.twingate.com and `{PROFILE_CONFIG}`  with the corresponding values
     - `SLACK_SECRET` can be found at the page "Basic Information" in Slack API app page
@@ -42,7 +42,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
         - profiles: List of Object, where each Object defines a group profile
         - profileName: User friendly group profile name
         - groups: List of Twingate groups within the profile which the users can switch to
-        - applicableToGroup: A Twingate group which the users within it can access the group profile
+        - applicableToGroup: A Twingate group which the users within it can access the group profile, set to 'Everyone' to give all Twingate users the access to the group profile
 ```
     export BOT_TOKEN={SLACK_BOT_TOKEN}
     export SIGNING_SECRET={SLACK_SECRET}
@@ -59,7 +59,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 ```
 
 
-4. Enter the following commands to build the Docker image
+4. Enter the following commands to build the Docker image, change europe-west2-a to your preferred region
 ```
     gcloud config set compute/zone europe-west2-a
     cd tg-group-profile-manager
@@ -69,7 +69,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
     gcloud builds submit --tag gcr.io/${PROJECT_ID}/tg-group-profile-manager .
 ```
 
-5. Enter the following commands to deploy the app to Cloud Run
+5. Enter the following commands to deploy the app to Cloud Run, change europe-west2 to your preferred region
 ```
     gcloud services enable run.googleapis.com
     gcloud config set run/platform managed
@@ -81,9 +81,10 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 
 6. Select `Yes` to `Allow unauthenticated invocations to [tg-group-profile-manager]`
 7. Copy out the URL of the Slack app, e.g. `https://tg-group-profile-manager-xxxxx-nw.a.run.app`
-8. (Optional) Configure Cloud Run
+8. (Optional) Improve Performance
    * The Cloud Run can take between 5-10 seconds to process the switch group requests with the default Cloud Run configuration
-   * [CPU is always allocated](https://cloud.google.com/run/docs/configuring/cpu-allocation#setting) can be enabled in Cloud Run to improve performance (to 1-2 seconds)
+   * (Recommended) [CPU is always allocated](https://cloud.google.com/run/docs/configuring/cpu-allocation#setting) can be enabled in Cloud Run to improve performance (to 1-2 seconds)
+   * (Alternatively) Cloud Run [CPU boost](https://cloud.google.com/blog/products/serverless/announcing-startup-cpu-boost-for-cloud-run--cloud-functions) can be enabled in Cloud Run, but the improvement is not as significant as [CPU is always allocated](https://cloud.google.com/run/docs/configuring/cpu-allocation#setting)
 
 ### Finishing Setup in Slack App UI
 1. Go to your app at [Slack App UI](https://api.slack.com/apps)
@@ -92,3 +93,8 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 * Interactivity & Shortcuts
    * Replace the Request URL to `https://{Your tg-group-profile-manager Address}/slack/events`
 4. Download the [Twingate Logo](https://github.com/Twingate-Labs/tg-group-profile-manager/blob/main/Twingate%20Logo%20-%20Icon.png) and change the logo of the Slack app at the Basic Info
+
+### Limitations
+1. When there are Twingate groups with duplicate names, only the first group returned by the Twingate API is used. To prevent this, ensure there are no duplicate group names in the Twingate network.
+2. If a user is part of more than 50 Twingate groups, only the first 50 Twingate groups returned by the Twingate API is used. To prevent this, ensure there are no users part of more than 50 groups in the Twingate network.
+3. The Slack users' email addresses need to be the same as their Twingate email addresses.

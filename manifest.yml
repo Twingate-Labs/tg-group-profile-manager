@@ -1,6 +1,6 @@
 display_information:
-  name: Twingate Group Policy Manager
-  description: Let users manage their own Twingate group policies.
+  name: Twingate Group Profile Manager
+  description: Let users manage their own Twingate group profiles.
   background_color: "#212224"
 features:
   app_home:
@@ -8,7 +8,7 @@ features:
     messages_tab_enabled: false
     messages_tab_read_only_enabled: true
   bot_user:
-    display_name: Twingate Group Policy Manager
+    display_name: Twingate Group Profile Manager
     always_online: false
 oauth_config:
   scopes:
@@ -18,12 +18,12 @@ oauth_config:
       - users:read.email
 settings:
   event_subscriptions:
-    request_url: https://5bc9-137-220-73-91.eu.ngrok.io/slack/events
+    request_url: https://tg-group-profile-manager-t5ukt5uhmq-nw.a.run.app/slack/events
     bot_events:
       - app_home_opened
   interactivity:
     is_enabled: true
-    request_url: https://5bc9-137-220-73-91.eu.ngrok.io/slack/events
+    request_url: https://tg-group-profile-manager-t5ukt5uhmq-nw.a.run.app/slack/events
   org_deploy_enabled: false
   socket_mode_enabled: false
   token_rotation_enabled: false

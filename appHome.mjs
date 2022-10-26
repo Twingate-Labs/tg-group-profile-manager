@@ -7,6 +7,41 @@ export const createHome = async(profileConfig, userEmail) => {
         const profileManager = new SlackProfileManager()
         await profileManager.init()
         const userWithGroups = await profileManager.lookupUserGroupByEmail(userEmail);
+        if (!userWithGroups) {
+            console.log(`Email '${userEmail}' not found in Twingate`)
+             return {
+                 "type": "home",
+                 "blocks": [
+                     {
+                     type: "section",
+                     text: {
+                         type: "mrkdwn",
+                         text: "*Welcome!* \nThis is home for Twingate Group Profile Manager."
+                     }
+                    },
+                     {
+                         type: "context",
+                         elements: [
+                             {
+                                 type: "mrkdwn",
+                                 text: "<https://github.com/Twingate-Labs/tg-profile-management-tool|GitHub> and <https://github.com/Twingate-Labs/tg-profile-management-tool/blob/main/README.md|User Guide>"
+                             }
+                         ]
+                     },
+                     {
+                         type: "divider"
+                     },
+                     {
+                         type: "section",
+                         "text": {
+                             "type": "mrkdwn",
+                             "text": `*ERROR*\n Email '${userEmail}' not found in Twingate, please ensure your Slack account email address is the same as your Twingate email address.`
+                         }
+                     }
+                 ]
+             }
+        }
+
         const userId = userWithGroups.id
         const userGroups = userWithGroups.groups.edges.map(group => group.node)
         const permittedProfiles = profileConfig.profiles.filter(profile => userGroups.map(group=>group.name).includes(profile.applicableToGroup))
@@ -25,7 +60,6 @@ export const createHome = async(profileConfig, userEmail) => {
                     elements: [
                         {
                             type: "mrkdwn",
-                            // todo: confirm the url is working
                             text: "<https://github.com/Twingate-Labs/tg-profile-management-tool|GitHub> and <https://github.com/Twingate-Labs/tg-profile-management-tool/blob/main/README.md|User Guide>"
                         }
                     ]
