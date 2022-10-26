@@ -49,7 +49,7 @@
         },
         "postcreate": {
             "commands": [
-                "gcloud run services update tg-group-profile-manager --no-cpu-throttling"
+                "gcloud run services update tg-group-profile-manager --no-cpu-throttling --project $$GOOGLE_CLOUD_PROJECT"
             ]
         }
     }
