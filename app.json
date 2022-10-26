@@ -27,8 +27,8 @@
             "order": 50
         },
         "PROJECT_ID": {
-            "description": "GCP project Id (leave blank)",
-            "required": false,
+            "description": "GCP Project Id",
+            "required": true,
             "order": 60
         }
     },
