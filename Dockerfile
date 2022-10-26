@@ -9,5 +9,3 @@ RUN npm install
 COPY . .
 COPY tg-group-profile-manager.conf ./.env
 CMD ["node", "app.mjs"]
-
-EXPOSE 8080
