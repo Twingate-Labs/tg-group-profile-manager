@@ -50,7 +50,7 @@
         "postcreate": {
             "commands": [
                 "gcloud run services update tg-group-profile-manager --no-cpu-throttling --project $GOOGLE_CLOUD_PROJECT",
-                "gcloud run services update tg-group-profile-manager --remove-env-vars [SLACK_BOT_TOKEN,TG_API_KEY,TG_ACCOUNT,PROFILE_CONFIG,SLACK_SIGNING_SECRET]"
+                "gcloud run services update tg-group-profile-manager --project $GOOGLE_CLOUD_PROJECT --remove-env-vars [SLACK_BOT_TOKEN,TG_API_KEY,TG_ACCOUNT,PROFILE_CONFIG,SLACK_SIGNING_SECRET]"
             ]
         }
     }
