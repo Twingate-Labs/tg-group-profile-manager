@@ -1,0 +1,52 @@
+{
+    "name": "tg-group-profile-manager",
+    "env": {
+        "SLACK_SIGNING_SECRET": {
+            "description": "Slack Signing Secret",
+            "required": true,
+            "order": 10
+        },
+        "SLACK_BOT_TOKEN": {
+            "description": "Slack Bot Token",
+            "required": true,
+            "order": 20
+        },
+        "TG_API_KEY": {
+            "description": "Twingate API key (Read/Write token)",
+            "required": true,
+            "order": 30
+        },
+        "TG_ACCOUNT": {
+            "description": "Twingate account URL, for example xxx.twingate.com",
+            "required": true,
+            "order": 40
+        },
+        "PROFILE_CONFIG": {
+            "description": "Profile configuration (must be valid JSON)",
+            "required": true,
+            "order": 50
+        }
+    },
+    "options": {
+        "allow-unauthenticated": true,
+        "memory": "512Mi",
+        "cpu": "1",
+        "http2": false,
+        "max-instances": 1
+    },
+    "build": {
+        "skip": false
+    },
+    "hooks": {
+        "prebuild": {
+            "commands": [
+                "./cloudrun_prebuild.sh"
+            ]
+        },
+        "postcreate": {
+            "commands": [
+                "gcloud run services update tg-group-profile-manager --no-cpu-throttling"
+            ]
+        }
+    }
+}
