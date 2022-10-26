@@ -2,6 +2,7 @@
 ## Profile configuration schema
 The schema consists of an object with the following properties:
 - _profiles_: List of Object, where each Object defines a Profile
+- _groupPermissions_: Dictionary, where each key is a group name and value is a requisite group name for being able to select it. _Optional_.
 
 ### Profile:
 This object defines a single profile
@@ -24,6 +25,14 @@ This object defines a single profile
       ],
       "applicableToGroup": "Everyone"
     }
-  ]
+  ],
+  "groupPermissions": {
+    "Prod": "Admin"
+  }
 }
 ```
+
+In the example above:
+* Any user in the `Everyone` group can access the `Example Profile 1` Profile
+* Any user that can access the profile can choose from `Preprod` or `Testing` groups via the Slackbot
+* In order to select the `Prod` group a user must _also_ be in the requisite group named `Admin` because of the `groupPermission` object.
