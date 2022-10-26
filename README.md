@@ -2,8 +2,9 @@
 This project deploys a Slackbot that allows Twingate users to manage their own group profile.
 
 Common use cases:
-* Switching between environments that share the same IPs or DNS names (e.g. Development, Test, Production environments)
-* Switching between resources in different geographic regions
+* Manage access to resources that share the same IP addresses or DNS names
+* Segregate access to different environments (e.g. Development, Test, Production environments)
+* Switch between resources in different geographic regions
 
 Profiles can be configured in JSON and access to each profile can be restricted based on group membership. Currently the only profile type that is supported is a `one-of` pattern that ensures a user can only be in a single group from a set of possible groups.
 
@@ -33,7 +34,7 @@ Profiles can be configured in JSON and access to each profile can be restricted 
 
 The `Run on Google Cloud option` will prompt for all pre-requisite parameters during setup and store them as secrets. For a full description of the executed steps please see [`app.json`](./app.json).
 
-For a manual deployment you may instead follow the [manual instructions](./MANUAL_DEPLOYMENT.md) 
+For a manual deployment you may instead follow the [manual instructions](./docs/MANUAL_DEPLOYMENT.md) 
 
 ### Finishing Setup in Slack App UI
 1. Go to your app at [Slack App UI](https://api.slack.com/apps)
