@@ -17,6 +17,25 @@ async function initApp(app) {
         profileConfig = JSON.parse(process.env.PROFILE_CONFIG);
     }
 
+    // Set defaults
+    if ( !Array.isArray(profileConfig.profiles) ) {
+        console.warn("No profiles set in config");
+        profileConfig.profiles = [];
+    }
+    profileConfig.profiles.forEach(profile => {
+        // Make sure a profile name is set
+        if ( typeof profile.profileName !== "string" ) {
+            throw new Error("Profile with missing profileName property (mandatory)");
+        }
+        // Make sure there's a default applicableToGroup
+        profile.applicableToGroup = profile.applicableToGroup || "Everyone";
+        // Set an empty array at least
+        if ( !Array.isArray(profile.groups) ) {
+            console.warn(`No groups set in config for profile '${profile.profileName}'`);
+            profile.groups = [];
+        }
+    })
+
     // Listen for users opening your App Home
     app.event('app_home_opened', async ({ event, client, logger }) => {
         try {

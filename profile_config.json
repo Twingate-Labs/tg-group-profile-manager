@@ -1,24 +1,24 @@
-{
-  "profiles": [
-    {
-      "profileName": "Example Profile 1",
-      "profileType": "oneOf",
-      "groups": [
-        "Prod",
-        "Preprod",
-        "Testing"
-      ],
-      "applicableToGroup": "Everyone"
-    },
-    {
-      "profileName": "Example Profile 2",
-      "profileType": "oneOf",
-      "groups": [
-        "US",
-        "EU",
-        "ASIA"
-      ],
-      "applicableToGroup": "Everyone"
-    }
-  ]
-}
+  {
+    "profiles": [
+      {
+        "profileName": "Example Profile 1",
+        "profileType": "oneOf",
+        "groups": [
+          "Prod",
+          "Preprod",
+          "Testing"
+        ],
+        "applicableToGroup": "Everyone"
+      },
+      {
+        "profileName": "Example Profile 2",
+        "profileType": "oneOf",
+        "groups": [
+          "US",
+          "EU",
+          "ASIA"
+        ],
+        "applicableToGroup": "Everyone"
+      }
+    ]
+  }
