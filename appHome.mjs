@@ -16,7 +16,7 @@ export const createHome = async(profileConfig, userEmail) => {
                      type: "section",
                      text: {
                          type: "mrkdwn",
-                         text: "*Welcome!* \nThis is home for Twingate Group Profile Manager."
+                         text: "*Welcome!* \nUsing this tool you can change your group profiles.**Please note all changes can take at least 20 seconds to propagate."
                      }
                     },
                      {
@@ -24,7 +24,7 @@ export const createHome = async(profileConfig, userEmail) => {
                          elements: [
                              {
                                  type: "mrkdwn",
-                                 text: "<https://github.com/Twingate-Labs/tg-profile-management-tool|GitHub> and <https://github.com/Twingate-Labs/tg-profile-management-tool/blob/main/README.md|User Guide>"
+                                 text: "<https://github.com/Twingate-Labs/tg-group-profile-manager|GitHub> and <https://github.com/Twingate-Labs/tg-group-profile-manager/blob/main/README.md|User Guide>"
                              }
                          ]
                      },

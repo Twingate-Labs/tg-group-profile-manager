@@ -76,12 +76,13 @@ export const submitChange = async (profileConfig, userEmail, profileName, select
 
 
     let response = ""
+    const userGroupNames = userGroups.map(userGroup => userGroup.name)
     switch (selectedGroup) {
         case "no_group":
             for (const group of profile.groups) {
                 const groupId = GroupNameToIdMap[group] || await profileManager.lookupGroupByName(group)
                 GroupNameToIdMap[group] = groupId
-                if (userGroups.map(userGroup => userGroup.name).includes(group)) {
+                if (userGroupNames.includes(group)) {
                     response = await profileManager.removeUserFromGroup(groupId, userId);
                     console.log(`User '${userEmail}' in profile '${profile.profileName}' group '${group}', removing user from group.`)
                 } else {
@@ -96,7 +97,7 @@ export const submitChange = async (profileConfig, userEmail, profileName, select
             // remove user from groups
             for (const group of groupToRemove){
 
-                if (userGroups.map(userGroup => userGroup.name).includes(group)) {
+                if (userGroupNames.includes(group)) {
                     const groupId = GroupNameToIdMap[group] || await profileManager.lookupGroupByName(group)
                     GroupNameToIdMap[group] = groupId
                     response = await profileManager.removeUserFromGroup(groupId, userId);
@@ -107,7 +108,7 @@ export const submitChange = async (profileConfig, userEmail, profileName, select
             }
 
             // add user to group
-            if (userGroups.map(userGroup => userGroup.name).includes(groupToAdd)) {
+            if (userGroupNames.includes(groupToAdd)) {
                 console.log(`User '${userEmail}' in profile '${profile.profileName}' group '${groupToAdd}', skipping adding.`)
             } else {
                 const groupId = GroupNameToIdMap[groupToAdd] || await profileManager.lookupGroupByName(groupToAdd)
