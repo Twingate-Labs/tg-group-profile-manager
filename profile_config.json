@@ -1,0 +1,24 @@
+{
+  "profiles": [
+    {
+      "profileName": "ExampleProfileName1",
+      "profileType": "oneOf",
+      "groups": [
+        "Prod",
+        "Preprod",
+        "Testing"
+      ],
+      "applicableToGroup": "Everyone"
+    },
+    {
+      "profileName": "ExampleProfileName2",
+      "profileType": "oneOf",
+      "groups": [
+        "US",
+        "EU",
+        "ASIA"
+      ],
+      "applicableToGroup": "Everyone"
+    }
+  ]
+}

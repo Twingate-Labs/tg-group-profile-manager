@@ -33,19 +33,18 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 ### (Option 2) Deploy as Google Cloud Run
 1. Open Google [Cloud Shell](https://cloud.google.com/shell)
 2. Clone the project `git clone https://github.com/Twingate-Labs/tg-group-profile-manager.git`
-3. Populate `tg-group-profile-manager.conf`
+3. `cd tg-group-profile-manager` and populate `tg-group-profile-manager.conf`
     - `SLACK_SECRET` can be found at the page "Basic Information" in Slack API app page
     - `SLACK_BOT_TOKEN` can be found at page "OAuth & Permissions"
     - `TG_API_KEY` can be generated in the Setting page within the Twingate Admin Console (Read and Write Token is required)
     - `TG_ACCOUNT` replace with your Twingate Network Address (e.g. test1.twingate.com)
-    - `PROFILE_CONFIG` see example at [tg-group-profile-manager.conf](https://github.com/Twingate-Labs/tg-group-profile-manager/blob/main/tg-group-profile-manager.conf)
-        - profiles: List of Object, where each Object defines a group profile
-        - profileName: User friendly group profile name
-        - groups: List of Twingate groups within the profile which the users can switch to
-        - applicableToGroup: A Twingate group which the users within it can access the group profile, set to 'Everyone' to give all Twingate users the access to the group profile
-4. Execute the following commands
+4. Update the file `profile_config.json`
+    - profiles: List of Object, where each Object defines a group profile
+    - profileName: User friendly group profile name
+    - groups: List of Twingate groups within the profile which the users can switch to
+    - applicableToGroup: A Twingate group which the users within it can access the group profile, set to 'Everyone' to give all Twingate users the access to the group profile
+5. Execute the following commands to deploy CloudRun
 ```
-cd tg-group-profile-manager
 gcloud config set compute/zone europe-west2-a # change to your preferred zone
 gcloud config set run/region europe-west2 # change to your preferred region
 export PROJECT_ID=$(gcloud config list --format 'value(core.project)')

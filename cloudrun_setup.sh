@@ -7,6 +7,9 @@ set +a
 ## Tell the container to run as CloudRun
 export DEPLOY_ENV=cloudrun
 
+## Import profile config
+export PROFILE_CONFIG=$(cat profile_config.json)
+
 
 ## Enable and setup secret manager
 gcloud services enable secretmanager.googleapis.com
