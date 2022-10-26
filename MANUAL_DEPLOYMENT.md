@@ -25,3 +25,22 @@ export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)
    * The Cloud Run can take between 10-20 seconds to process the switch group requests with the default Cloud Run configuration
    * (Recommended) [CPU is always allocated](https://cloud.google.com/run/docs/configuring/cpu-allocation#setting) can be enabled in Cloud Run to improve performance (to 1-2 seconds)
    * (Alternatively) Cloud Run [CPU boost](https://cloud.google.com/blog/products/serverless/announcing-startup-cpu-boost-for-cloud-run--cloud-functions) can be enabled in Cloud Run, but the improvement is not as significant as [CPU is always allocated](https://cloud.google.com/run/docs/configuring/cpu-allocation#setting)
+
+
+### Deploy on Docker
+1. Clone the latest tg group profile manager `git clone https://github.com/Twingate-Labs/tg-group-profile-manager.git`
+2. `cd tg-group-profile-manager`
+3. Populate `tg-group-profile-manager.conf`
+   - `SLACK_SIGNING_SECRET=xxx` can be found at the page "Basic Information" in Slack API app page
+   - `SLACK_BOT_TOKEN=xxx` can be found at page "OAuth & Permissions"
+   - `TG_API_KEY=xxx` can be generated in the Setting page within the Twingate Admin Console (Read, Write & Provision Token is required)
+   - `TG_ACCOUNT=xxx.twingate.com` replace with your Twingate Network Address
+   - `PROFILE_CONFIG` 
+     - profiles: List of Object, where each Object defines a group profile
+     - profileName: User friendly group profile name
+     - groups: List of Twingate groups within the profile which the users can switch to
+     - applicableToGroup: A Twingate group which the users within it can access the group profile
+   - `DEPLOY_ENV=docker`
+4. Build Docker container `docker build . -t tg-group-profile-manager`
+5. Run Docker container `docker run -p 8080:8080 -d --name tg-group-profile-manager tg-group-profile-manager`
+6. Now you have the `tg-group-profile_manager` running
