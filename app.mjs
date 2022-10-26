@@ -113,11 +113,11 @@ async function initApp(app) {
             // Make sure user is allowed to access profile
             if ( !userGroupNames.includes(requestedProfile.applicableToGroup) ) throw new Error(`User '${userEmail}' has no access to profile '${requestedProfileName}'`);
 
-            // Make sure user is allowed to access select group
+            // Make sure user is allowed to access selected group
             if ( !requestedProfile.groups.includes(selectedGroup) ) throw new Error(`User '${userEmail}' not allowed to access requested group '${selectedGroup}' in profile '${requestedProfileName}'`);
 
             if ( typeof profileConfig.groupPermissions[selectedGroup] === "string") {
-                // Switching to this group requires that user is already in another group
+                // Switching to this group requires that user is already in another group, exit if they don't have permission
                 if ( !userGroupNames.includes(profileConfig.groupPermissions[selectedGroup])) throw new Error(`User '${userEmail}' has no access to group '${selectedGroup}' in profile '${requestedProfileName}' because they are not a member of required group '${profileConfig.groupPermissions[selectedGroup]}'`)
             }
 
