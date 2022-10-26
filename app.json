@@ -31,8 +31,7 @@
         "allow-unauthenticated": true,
         "memory": "512Mi",
         "cpu": "1",
-        "http2": false,
-        "max-instances": 1
+        "http2": false
     },
     "build": {
         "skip": false
