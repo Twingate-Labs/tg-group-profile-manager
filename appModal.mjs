@@ -1,8 +1,7 @@
 import {SlackProfileManager} from "./SlackProfileManager.mjs";
 
-export const openModal = async (profileConfig, requestValue) => {
-    const [actionValue, userEmail] = requestValue.split("++")
-    const profile = profileConfig.profiles.filter(profile => profile.profileName == actionValue)[0]
+// Called when a user opens a profile - get configuration for profile and shot it in a modal
+export const openModal = async (profileConfig, profile, userEmail, tgUser) => {
 
     let modal = {
         type: 'modal',
@@ -51,7 +50,7 @@ export const openModal = async (profileConfig, requestValue) => {
                 type: "plain_text",
                 text: group
             },
-            value: `${profile.profileName}++${group}++${userEmail}`
+            value: JSON.stringify([profile.profileName, group])
         }
 
         modal.blocks[0]["accessory"]["options"].push(option)
@@ -63,17 +62,15 @@ export const openModal = async (profileConfig, requestValue) => {
 
 const GroupNameToIdMap = {};
 
-export const submitChange = async (profileConfig, userEmail, profileName, selectedGroup) => {
-    const profile = profileConfig.profiles.filter(profile => profile.profileName == profileName)[0]
+// Apply oneOf profile change
+export const submitChange = async (profileConfig, userEmail, profile, selectedGroup, tgUser) => {
     const profileManager = new SlackProfileManager()
     await profileManager.init()
-    const userWithGroups = await profileManager.lookupUserGroupByEmail(userEmail);
-    const userId = userWithGroups.id
-    const userGroups = userWithGroups.groups.edges.map(group => group.node)
+    const userId = tgUser.id
+    const userGroups = tgUser.groups.edges.map(group => group.node)
     for (const group of userGroups){
         GroupNameToIdMap[group.name] = group.id
     }
-
 
     let response = ""
     const userGroupNames = userGroups.map(userGroup => userGroup.name)
