@@ -1,7 +1,7 @@
 {
   "profiles": [
     {
-      "profileName": "ExampleProfileName1",
+      "profileName": "Example Profile 1",
       "profileType": "oneOf",
       "groups": [
         "Prod",
@@ -11,7 +11,7 @@
       "applicableToGroup": "Everyone"
     },
     {
-      "profileName": "ExampleProfileName2",
+      "profileName": "Example Profile 2",
       "profileType": "oneOf",
       "groups": [
         "US",

@@ -1,9 +1,11 @@
 # tg-group-profile-manager
-This project deploys a Slackbot that provide Twingate users to manage their own group profile.
+This project deploys a Slackbot that allows Twingate users to manage their own group profile.
 
 Common use cases:
 * Switching between environments that share the same IPs or DNS names (e.g. Development, Test, Production environments)
 * Switching between resources in different geographic regions
+
+Profiles can be configured in JSON and access to each profile can be restricted based on group membership. Currently the only profile type that is supported is a `one-of` pattern that ensures a user can only be in a single group from a set of possible groups.
 
 ## Prerequisites
 1. Slack Workspace (with admin access to deploy)
@@ -24,7 +26,7 @@ Common use cases:
     - `TG_API_KEY` can be generated in the Setting page within the Twingate Admin Console (Read and Write Token is required)
     - `TG_ACCOUNT` replace with your Twingate Network Address (e.g. test1.twingate.com)
     - `PROJECT_ID` GCP Project (will be passed to container for it to access secrets)
-2. Prepare your profile configuration following the example in [`profile_config.json`](./profile_config.json)
+2. Prepare your profile configuration following the notes in the [schema documentation](./SCHEMA.md)
 3. Click and follow the steps in GCP CloudShell:
 
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/Twingate-Labs/tg-group-profile-manager)
