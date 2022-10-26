@@ -13,8 +13,8 @@ Profiles can be configured in JSON and access to each profile can be restricted 
 2. A [Twingate](https://www.twingate.com/) account
 3. Ability to deploy a Slackbot (instructions below)
 
-## Set Up Steps
-### Slack App Initial Setup
+## Install Steps
+### Create and setup Slack App
 1. Create New Slack app from a manifest [here](https://api.slack.com/apps)
 2. Paste the content from [manifest.yaml](https://github.com/Twingate-Labs/tg-group-profile-manager/blob/main/manifest.yml)
 3. Install the Slack app to your Workspace
@@ -36,7 +36,7 @@ The `Run on Google Cloud option` will prompt for all pre-requisite parameters du
 
 For a manual deployment you may instead follow the [manual instructions](./docs/MANUAL_DEPLOYMENT.md) 
 
-### Finishing Setup in Slack App UI
+### Complete setup in Slack App UI
 1. Go to your app at [Slack App UI](https://api.slack.com/apps)
 3. Event Subscription
    * Replace the Request URL to `https://{Your tg-group-profile-manager Address}/slack/events`
@@ -44,7 +44,7 @@ For a manual deployment you may instead follow the [manual instructions](./docs/
    * Replace the Request URL to `https://{Your tg-group-profile-manager Address}/slack/events`
 4. Download the [Twingate Logo](https://github.com/Twingate-Labs/tg-group-profile-manager/blob/main/Twingate%20Logo%20-%20Icon.png) and change the logo of the Slack app at the Basic Info
 
-### Current Limitations & Known Issues
+### Current limitations & known issues
 1. When there are Twingate groups with duplicate names, only the first group returned by the Twingate API is used. To prevent this, ensure there are no duplicate group names in the Twingate network.
 2. If a user is part of more than 50 Twingate groups, only the first 50 Twingate groups returned by the Twingate API is used. To prevent this, ensure there are no users part of more than 50 groups in the Twingate network.
 3. The Slack users' email addresses needs to be the same as their Twingate email address.
