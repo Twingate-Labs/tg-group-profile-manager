@@ -4,6 +4,8 @@
 export DEPLOY_ENV=cloudrun
 export PROJECT_ID=$GOOGLE_CLOUD_PROJECT
 gcloud config set run/region $GOOGLE_CLOUD_REGION
+export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)' --filter 'NAME:Compute Engine default service account')
+
 ## Enable and setup secret manager
 gcloud services enable secretmanager.googleapis.com
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=user:$(gcloud auth list --format 'value(account)') --role=roles/secretmanager.admin
