@@ -12,7 +12,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 3. Install the Slack app to your Workspace
 4. Retrieve the signing secret from Basic Info and bot token at OAuth & Permissions
 
-### (Option 1) Deploy as Docker
+### Deploy on Docker
 1. Clone the latest tg group profile manager `git clone https://github.com/Twingate-Labs/tg-group-profile-manager.git`
 2. `cd tg-group-profile-manager`
 3. Populate `tg-group-profile-manager.conf`
@@ -30,34 +30,19 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 5. Run Docker container `docker run -p 8080:8080 -d --name tg-group-profile-manager tg-group-profile-manager`
 6. Now you have the `tg-group-profile_manager` running
 
-### (Option 2) Deploy as Google Cloud Run
-1. Open Google [Cloud Shell](https://cloud.google.com/shell)
-2. Clone the project `git clone https://github.com/Twingate-Labs/tg-group-profile-manager.git`
-3. `cd tg-group-profile-manager` and populate `tg-group-profile-manager.conf`
+### Deploy on Google CloudRun (CloudRun Button)
+1. Ensure you have the following pre-requisites:
     - `SLACK_SECRET` can be found at the page "Basic Information" in Slack API app page
     - `SLACK_BOT_TOKEN` can be found at page "OAuth & Permissions"
     - `TG_API_KEY` can be generated in the Setting page within the Twingate Admin Console (Read and Write Token is required)
     - `TG_ACCOUNT` replace with your Twingate Network Address (e.g. test1.twingate.com)
-4. Update the file `profile_config.json`
-    - profiles: List of Object, where each Object defines a group profile
-    - profileName: User friendly group profile name
-    - groups: List of Twingate groups within the profile which the users can switch to
-    - applicableToGroup: A Twingate group which the users within it can access the group profile, set to 'Everyone' to give all Twingate users the access to the group profile
-5. Execute the following commands to deploy CloudRun
-```
-gcloud config set compute/zone europe-west2-a # change to your preferred zone
-gcloud config set run/region europe-west2 # change to your preferred region
-export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
-export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)' --filter 'NAME:Compute Engine default service account')
-./cloudrun_setup.sh
-```
-4. Copy out the URL of the Slack app, e.g. `https://tg-group-profile-manager-xxxxx-nw.a.run.app`
-5. (Optional) Improve Performance
-   * The Cloud Run can take between 10-20 seconds to process the switch group requests with the default Cloud Run configuration
-   * (Recommended) [CPU is always allocated](https://cloud.google.com/run/docs/configuring/cpu-allocation#setting) can be enabled in Cloud Run to improve performance (to 1-2 seconds)
-   * (Alternatively) Cloud Run [CPU boost](https://cloud.google.com/blog/products/serverless/announcing-startup-cpu-boost-for-cloud-run--cloud-functions) can be enabled in Cloud Run, but the improvement is not as significant as [CPU is always allocated](https://cloud.google.com/run/docs/configuring/cpu-allocation#setting)
+    - `PROJECT_ID` GCP Project (will be passed to container for it to access secrets)
+2. Prepare your profile configuration following the example in [`profile_config.json`](./profile_config.json)
+3. Click and follow the steps in GCP CloudShell:[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/Twingate-Labs/tg-group-profile-manager)
 
-[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/Twingate-Labs/tg-group-profile-manager)
+The `Run on Google Cloud option` will prompt for all pre-requisite parameters during setup and store them as secrets. For full config see [`app.json`](./app.json).
+
+For a manual deployment on CloudRun you may instead follow the [manual instructions](./MANUAL_DEPLOYMENT.md) 
 
 ### Finishing Setup in Slack App UI
 1. Go to your app at [Slack App UI](https://api.slack.com/apps)
