@@ -25,9 +25,11 @@ Common use cases:
     - `TG_ACCOUNT` replace with your Twingate Network Address (e.g. test1.twingate.com)
     - `PROJECT_ID` GCP Project (will be passed to container for it to access secrets)
 2. Prepare your profile configuration following the example in [`profile_config.json`](./profile_config.json)
-3. Click and follow the steps in GCP CloudShell:[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/Twingate-Labs/tg-group-profile-manager)
+3. Click and follow the steps in GCP CloudShell:
 
-The `Run on Google Cloud option` will prompt for all pre-requisite parameters during setup and store them as secrets. For full config see [`app.json`](./app.json).
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/Twingate-Labs/tg-group-profile-manager)
+
+The `Run on Google Cloud option` will prompt for all pre-requisite parameters during setup and store them as secrets. For a full description of the executed steps please see [`app.json`](./app.json).
 
 For a manual deployment you may instead follow the [manual instructions](./MANUAL_DEPLOYMENT.md) 
 
