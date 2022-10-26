@@ -15,9 +15,3 @@ echo -n $TG_API_KEY | gcloud secrets create tg-group-profile-manager-tg-api-key 
 echo -n $TG_ACCOUNT | gcloud secrets create tg-group-profile-manager-tg-account --project $PROJECT_ID --replication-policy=automatic --data-file=-
 echo -n $PROFILE_CONFIG | gcloud secrets create tg-group-profile-manager-profile-config --project $PROJECT_ID --replication-policy=automatic --data-file=-
 
-export SLACK_BOT_TOKEN=""
-export SLACK_SIGNING_SECRET=""
-export TG_API_KEY=""
-export TG_ACCOUNT=""
-export PROFILE_CONFIG=""
-
