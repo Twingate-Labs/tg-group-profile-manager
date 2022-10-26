@@ -18,6 +18,9 @@ async function initApp(app) {
     }
 
     // Set defaults
+    if ( typeof profileConfig.groupPermissions !== "object") {
+        profileConfig.groupPermissions = {};
+    }
     if ( !Array.isArray(profileConfig.profiles) ) {
         console.warn("No profiles set in config");
         profileConfig.profiles = [];
@@ -95,7 +98,7 @@ async function initApp(app) {
         const selectedOption = Object.values(Object.values(body.view.state.values)[0])[0].selected_option;
         const [requestedProfileName, selectedGroup] = JSON.parse(selectedOption.value)
         try {
-
+            // TODO: can refactor this security checking into a reusable function
             const slackUserInfo = await client.users.info({user: body.user.id});
             const userEmail = slackUserInfo.user.profile.email;
             const requestedProfile = profileConfig.profiles.find(profile => profile.profileName === requestedProfileName);
@@ -113,13 +116,18 @@ async function initApp(app) {
             // Make sure user is allowed to access select group
             if ( !requestedProfile.groups.includes(selectedGroup) ) throw new Error(`User '${userEmail}' not allowed to access requested group '${selectedGroup}' in profile '${requestedProfileName}'`);
 
+            if ( typeof profileConfig.groupPermissions[selectedGroup] === "string") {
+                // Switching to this group requires that user is already in another group
+                if ( !userGroupNames.includes(profileConfig.groupPermissions[selectedGroup])) throw new Error(`User '${userEmail}' has no access to group '${selectedGroup}' in profile '${requestedProfileName}' because they are not a member of required group '${profileConfig.groupPermissions[selectedGroup]}'`)
+            }
+
             await submitChange(profileConfig, userEmail, requestedProfile, selectedGroup, tgUser);
             const homeView = await createHome(profileConfig, userEmail);
             const result = await client.views.publish({
                 user_id: body.user.id,
                 "view": homeView
             });
-            logger.info(`User '${userEmail}' changed profile '${profileName}' to group '${selectedGroup}'`)
+            logger.info(`User '${userEmail}' changed profile '${requestedProfileName}' to group '${selectedGroup}'`)
         }
         catch (error) {
             logger.error(error);

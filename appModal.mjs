@@ -43,8 +43,13 @@ export const openModal = async (profileConfig, profile, userEmail, tgUser) => {
             }
         ]
     }
+    const userGroupNames = tgUser.groups.edges.map(group => group.node.name)
 
     for (const group of profile.groups) {
+        const permissionGroup = profileConfig.groupPermissions[group];
+        // If switching to this group requires that user is already in another group then skip if they're not allowed this group
+        if ( typeof permissionGroup === "string" && !userGroupNames.includes(permissionGroup) ) continue;
+
         const option = {
             text: {
                 type: "plain_text",

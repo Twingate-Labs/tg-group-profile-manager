@@ -20,5 +20,8 @@
         ],
         "applicableToGroup": "Everyone"
       }
-    ]
+    ],
+    "groupPermissions": {
+      "Prod": "Admin"
+    }
   }
