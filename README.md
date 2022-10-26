@@ -1,7 +1,7 @@
 # tg-group-profile-manager
-This project deploys a Slackbot that allows Twingate users to manage their own group profile.
+This repository consists of a Slackbot that allows Twingate users to self-serve access to different groups according to policies defined by their network administrators. In essence, it brings the concept of _profiles_ to Twingate.
 
-Common use cases:
+Typical use cases:
 * Manage access to resources that share the same IP addresses or DNS names
 * Segregate access to different environments (e.g. Development, Test, Production environments)
 * Switch between resources in different geographic regions
