@@ -28,4 +28,4 @@ gcloud builds submit --tag gcr.io/${PROJECT_ID}/tg-group-profile-manager .
 gcloud services enable run.googleapis.com
 gcloud config set run/platform managed
 gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/secretmanager.secretAccessor
-gcloud run deploy tg-group-profile-manager --allow-unauthenticated --image gcr.io/${PROJECT_ID}/tg-group-profile-manager --set-env-vars PROJECT_ID=${PROJECT_ID}
+gcloud run deploy tg-group-profile-manager --no-cpu-throttling --allow-unauthenticated --image gcr.io/${PROJECT_ID}/tg-group-profile-manager --set-env-vars PROJECT_ID=${PROJECT_ID}
