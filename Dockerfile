@@ -7,5 +7,4 @@ RUN npm install
 
 # Bundle app source.
 COPY . .
-COPY tg-group-profile-manager.conf ./.env
 CMD ["node", "app.mjs"]

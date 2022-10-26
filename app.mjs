@@ -14,7 +14,6 @@ async function initApp(app) {
         profileConfig = JSON.parse(await accessSecretVersion('tg-group-profile-manager-profile-config'));
     } else {
         profileConfig = JSON.parse(process.env.PROFILE_CONFIG);
-
     }
 
     // Listen for users opening your App Home
