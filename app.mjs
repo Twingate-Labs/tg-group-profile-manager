@@ -5,13 +5,16 @@ import dotenvPkg from 'dotenv';
 import {accessSecretVersion} from "./utils.mjs";
 const {App} = boltPkg;
 dotenvPkg.config();
-let profileConfig = JSON.parse(process.env.PROFILE_CONFIG);
 
 async function initApp(app) {
     // fetching secrete from google cloud
     //todo: centralise all accessSecretVersion
+    let profileConfig = ""
     if (process.env.DEPLOY_ENV !== "docker") {
-        profileConfig = JSON.parse(await accessSecretVersion('tg-group-profile-manager-profile-config'))
+        profileConfig = JSON.parse(await accessSecretVersion('tg-group-profile-manager-profile-config'));
+    } else {
+        profileConfig = JSON.parse(process.env.PROFILE_CONFIG);
+
     }
 
     // Listen for users opening your App Home
