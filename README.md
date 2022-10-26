@@ -39,9 +39,9 @@ For a manual deployment you may instead follow the [manual instructions](./docs/
 ### Complete setup in Slack App UI
 1. Go to your app at [Slack App UI](https://api.slack.com/apps)
 3. Event Subscription
-   * Replace the Request URL to `https://{Your tg-group-profile-manager Address}/slack/events`
+   * Replace the Request URL to `https://{Your tg-group-profile-manager URL}/slack/events`
 * Interactivity & Shortcuts
-   * Replace the Request URL to `https://{Your tg-group-profile-manager Address}/slack/events`
+   * Replace the Request URL to `https://{Your tg-group-profile-manager URL}/slack/events`
 4. Download the [Twingate Logo](https://github.com/Twingate-Labs/tg-group-profile-manager/blob/main/Twingate%20Logo%20-%20Icon.png) and change the logo of the Slack app at the Basic Info
 
 ### Current limitations & known issues
