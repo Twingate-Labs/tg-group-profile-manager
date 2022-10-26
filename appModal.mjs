@@ -82,9 +82,9 @@ export const submitChange = async (profileConfig, userEmail, profile, selectedGr
     switch (selectedGroup) {
         case "no_group":
             for (const group of profile.groups) {
-                const groupId = GroupNameToIdMap[group] || await profileManager.lookupGroupByName(group)
-                GroupNameToIdMap[group] = groupId
                 if (userGroupNames.includes(group)) {
+                    const groupId = GroupNameToIdMap[group] || await profileManager.lookupGroupByName(group)
+                    GroupNameToIdMap[group] = groupId
                     response = await profileManager.removeUserFromGroup(groupId, userId);
                     console.log(`User '${userEmail}' in profile '${profile.profileName}' group '${group}', removing user from group.`)
                 } else {
@@ -98,7 +98,7 @@ export const submitChange = async (profileConfig, userEmail, profile, selectedGr
 
             // remove user from groups
             for (const group of groupToRemove){
-
+                // Can wrap this up to avoid the duplicated code
                 if (userGroupNames.includes(group)) {
                     const groupId = GroupNameToIdMap[group] || await profileManager.lookupGroupByName(group)
                     GroupNameToIdMap[group] = groupId
