@@ -27,7 +27,7 @@
             "order": 50
         },
         "PROJECT_ID": {
-            "description": "GCP Project Id",
+            "description": "GCP Project Id (used to reference the secrets via the app)",
             "required": true,
             "order": 60
         }
