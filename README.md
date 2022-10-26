@@ -36,7 +36,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 3. Setup Google Secrete Manager, replace `{SLACK_BOT_TOKEN}`, `{SLACK_SECRET}`, `{TWINGATE_API_KEY}`, `{TWINGATE_ADDRESS}` in the format of xxx.twingate.com and `{PROFILE_CONFIG}`  with the corresponding values
     - `SLACK_SECRET` can be found at the page "Basic Information" in Slack API app page
     - `SLACK_BOT_TOKEN` can be found at page "OAuth & Permissions"
-    - `TG_API_KEY` can be generated in the Setting page within the Twingate Admin Console (Read, Write & Provision Token is required)
+    - `TG_API_KEY` can be generated in the Setting page within the Twingate Admin Console (Read and Write Token is required)
     - `TG_ACCOUNT` replace with your Twingate Network Address (e.g. test1.twingate.com)
     - `PROFILE_CONFIG` see example at [tg-group-profile-manager.conf](https://github.com/Twingate-Labs/tg-group-profile-manager/blob/main/tg-group-profile-manager.conf)
         - profiles: List of Object, where each Object defines a group profile
@@ -44,18 +44,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
         - groups: List of Twingate groups within the profile which the users can switch to
         - applicableToGroup: A Twingate group which the users within it can access the group profile, set to 'Everyone' to give all Twingate users the access to the group profile
 ```
-    export BOT_TOKEN={SLACK_BOT_TOKEN}
-    export SIGNING_SECRET={SLACK_SECRET}
-    export TG_API_KEY={TWINGATE_API_KEY}
-    export TG_ACCOUNT={TWINGATE_ADDRESS}
-    export PROFILE_CONFIG='{PROFILE_CONFIG}'
-    gcloud services enable secretmanager.googleapis.com
-    gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=user:$(gcloud auth list --format 'value(account)') --role=roles/secretmanager.admin
-    echo -n $BOT_TOKEN | gcloud secrets create tg-group-profile-manager-bot-token --replication-policy=automatic --data-file=-
-    echo -n $SIGNING_SECRET | gcloud secrets create tg-group-profile-manager-client-signing-secret --replication-policy=automatic --data-file=-
-    echo -n $TG_API_KEY | gcloud secrets create tg-group-profile-manager-tg-api-key --replication-policy=automatic --data-file=-
-    echo -n $TG_ACCOUNT | gcloud secrets create tg-group-profile-manager-tg-account --replication-policy=automatic --data-file=-
-    echo -n $PROFILE_CONFIG | gcloud secrets create tg-group-profile-manager-profile-config --replication-policy=automatic --data-file=-
+    ./cloudrun_setup.sh
 ```
 
 
