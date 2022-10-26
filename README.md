@@ -33,7 +33,7 @@ This project deploys a Slackbot which provide Twingate users to manage their own
 ### (Option 2) Deploy as Google Cloud Run
 1. Open Google [Cloud Shell](https://cloud.google.com/shell)
 2. Clone the project `git clone https://github.com/Twingate-Labs/tg-group-profile-manager.git`
-3. Setup Google Secrete Manager, replace `{SLACK_BOT_TOKEN}`, `{SLACK_SECRET}`, `{TWINGATE_API_KEY}`, `{TWINGATE_ADDRESS}` in the format of xxx.twingate.com and `{PROFILE_CONFIG}`  with the corresponding values
+3. Populate `tg-group-profile-manager.conf`
     - `SLACK_SECRET` can be found at the page "Basic Information" in Slack API app page
     - `SLACK_BOT_TOKEN` can be found at page "OAuth & Permissions"
     - `TG_API_KEY` can be generated in the Setting page within the Twingate Admin Console (Read and Write Token is required)
@@ -43,34 +43,17 @@ This project deploys a Slackbot which provide Twingate users to manage their own
         - profileName: User friendly group profile name
         - groups: List of Twingate groups within the profile which the users can switch to
         - applicableToGroup: A Twingate group which the users within it can access the group profile, set to 'Everyone' to give all Twingate users the access to the group profile
+4. Execute the following commands
 ```
-    ./cloudrun_setup.sh
+cd tg-group-profile-manager
+gcloud config set compute/zone europe-west2-a # change to your preferred zone
+gcloud config set run/region europe-west2 # change to your preferred region
+export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
+export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)' --filter 'NAME:Compute Engine default service account')
+./cloudrun_setup.sh
 ```
-
-
-4. Enter the following commands to build the Docker image, change europe-west2-a to your preferred region
-```
-    gcloud config set compute/zone europe-west2-a
-    cd tg-group-profile-manager
-    sed -i 's/DEPLOY_ENV=docker/DEPLOY_ENV=cloudrun/g' tg-group-profile-manager.conf
-    export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
-    gcloud services enable cloudbuild.googleapis.com
-    gcloud builds submit --tag gcr.io/${PROJECT_ID}/tg-group-profile-manager .
-```
-
-5. Enter the following commands to deploy the app to Cloud Run, change europe-west2 to your preferred region
-```
-    gcloud services enable run.googleapis.com
-    gcloud config set run/platform managed
-    gcloud config set run/region europe-west2
-    export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)' --filter 'NAME:Compute Engine default service account')
-    gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/secretmanager.secretAccessor
-    gcloud run deploy tg-group-profile-manager --image gcr.io/${PROJECT_ID}/tg-group-profile-manager --set-env-vars PROJECT_ID=${PROJECT_ID}
-```
-
-6. Select `Yes` to `Allow unauthenticated invocations to [tg-group-profile-manager]`
-7. Copy out the URL of the Slack app, e.g. `https://tg-group-profile-manager-xxxxx-nw.a.run.app`
-8. (Optional) Improve Performance
+4. Copy out the URL of the Slack app, e.g. `https://tg-group-profile-manager-xxxxx-nw.a.run.app`
+5. (Optional) Improve Performance
    * The Cloud Run can take between 5-10 seconds to process the switch group requests with the default Cloud Run configuration
    * (Recommended) [CPU is always allocated](https://cloud.google.com/run/docs/configuring/cpu-allocation#setting) can be enabled in Cloud Run to improve performance (to 1-2 seconds)
    * (Alternatively) Cloud Run [CPU boost](https://cloud.google.com/blog/products/serverless/announcing-startup-cpu-boost-for-cloud-run--cloud-functions) can be enabled in Cloud Run, but the improvement is not as significant as [CPU is always allocated](https://cloud.google.com/run/docs/configuring/cpu-allocation#setting)
