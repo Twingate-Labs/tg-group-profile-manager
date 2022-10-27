@@ -16,7 +16,7 @@ Profiles can be configured in JSON and access to each profile can be restricted 
 ## Install Steps
 ### Create and setup Slack App
 1. Create New Slack app from a manifest [here](https://api.slack.com/apps)
-2. Paste the content from [manifest.yaml](https://github.com/Twingate-Labs/tg-group-profile-manager/blob/main/manifest.yml)
+2. Paste the content from [manifest.yaml](./manifest.yml)
 3. Install the Slack app to your Workspace
 4. Retrieve the _signing secret_ from the `Basic Information` page and _bot token_ from `OAuth & Permissions` page
 
@@ -26,7 +26,7 @@ Please prepare the following configuration parameters (refer to the [example fil
  - `SLACK_BOT_TOKEN` Slack bot token (begins with `xoxb-`)
  - `TG_API_KEY` can be generated in the Setting page within the Twingate Admin Console (Read and Write permission is required)
  - `TG_ACCOUNT` replace with your Twingate Network Address (e.g. _test1.twingate.com_)
- - `PROFILE_CONFIG` Your profile configuration (see notes and guidance in the [schema documentation](./SCHEMA.md))
+ - `PROFILE_CONFIG` Your profile configuration (see notes and guidance in the [schema documentation](./docs/SCHEMA.md))
 
 ### Deploy on Google CloudRun (CloudRun Button)
 1. Ensure you have the following pre-requisites:
@@ -46,7 +46,7 @@ For a manual deployment you may instead follow the [manual instructions](./docs/
    * Replace the Request URL to `https://{Your tg-group-profile-manager URL}/slack/events`
 * Interactivity & Shortcuts
    * Replace the Request URL to `https://{Your tg-group-profile-manager URL}/slack/events`
-4. Download the [Twingate Logo](https://github.com/Twingate-Labs/tg-group-profile-manager/blob/main/Twingate%20Logo%20-%20Icon.png) and change the logo of the Slack app in the `Basic Info` page.
+4. Download the [Twingate Logo](./Twingate%20Logo%20-%20Icon.png) and change the logo of the Slack app in the `Basic Info` page.
 
 ### Current limitations & known issues
 1. When there are Twingate groups with duplicate names, only the first group returned by the Twingate API is used. To prevent this, ensure there are no duplicate group names in the Twingate network.
