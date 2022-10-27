@@ -65,7 +65,7 @@ async function initApp(app) {
             const requestedProfileName = body.actions[0].value;
             const requestedProfile = profileConfig.profiles.find(profile => profile.profileName === requestedProfileName);
             // Make sure profile exists
-            if ( !requestedProfile === undefined) throw new Error(`Profile not found.`)
+            if ( requestedProfile === undefined) throw new Error(`Profile not found.`)
 
             const profileManager = new SlackProfileManager()
             await profileManager.init()
@@ -103,7 +103,7 @@ async function initApp(app) {
             const userEmail = slackUserInfo.user.profile.email;
             const requestedProfile = profileConfig.profiles.find(profile => profile.profileName === requestedProfileName);
             // Make sure profile exists
-            if ( !requestedProfile === undefined) throw new Error(`Profile not found.`)
+            if ( requestedProfile === undefined) throw new Error(`Profile not found.`)
 
             const profileManager = new SlackProfileManager()
             await profileManager.init()
