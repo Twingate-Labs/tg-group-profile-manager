@@ -8,6 +8,10 @@ Typical use cases:
 
 Profiles can be configured in JSON and access to each profile can be restricted based on group membership. Currently the only profile type that is supported is a `one-of` pattern that ensures a user can only be in a single group from a set of possible groups.
 
+![profile_list](./images/profile_list.png)
+![change_group](./images/change_group.png)
+
+
 ## Prerequisites
 1. Slack Workspace (with admin access to deploy)
 2. A [Twingate](https://www.twingate.com/) account
