@@ -18,17 +18,21 @@ Profiles can be configured in JSON and access to each profile can be restricted 
 1. Create New Slack app from a manifest [here](https://api.slack.com/apps)
 2. Paste the content from [manifest.yaml](https://github.com/Twingate-Labs/tg-group-profile-manager/blob/main/manifest.yml)
 3. Install the Slack app to your Workspace
-4. Retrieve the signing secret from Basic Info and bot token at OAuth & Permissions
+4. Retrieve the _signing secret_ from the `Basic Information` page and _bot token_ from `OAuth & Permissions` page
+
+### Configuration
+Please prepare the following configuration parameters (refer to the [example file](./tg-group-profile-manager.conf)):
+ - `SLACK_SECRET` Slack signing secret
+ - `SLACK_BOT_TOKEN` Slack bot token
+ - `TG_API_KEY` can be generated in the Setting page within the Twingate Admin Console (Read and Write permission is required)
+ - `TG_ACCOUNT` replace with your Twingate Network Address (e.g. _test1.twingate.com_)
+ - `PROFILE_CONFIG` Your profile configuration (see notes and guidance in the [schema documentation](./SCHEMA.md))
 
 ### Deploy on Google CloudRun (CloudRun Button)
 1. Ensure you have the following pre-requisites:
-    - `SLACK_SECRET` can be found at the page "Basic Information" in Slack API app page
-    - `SLACK_BOT_TOKEN` can be found at page "OAuth & Permissions"
-    - `TG_API_KEY` can be generated in the Setting page within the Twingate Admin Console (Read and Write Token is required)
-    - `TG_ACCOUNT` replace with your Twingate Network Address (e.g. test1.twingate.com)
+    - All configuration parameters from the `Configuration` section above
     - `PROJECT_ID` GCP Project (will be passed to container for it to access secrets)
-2. Prepare your profile configuration following the notes in the [schema documentation](./SCHEMA.md)
-3. Click and follow the steps in GCP CloudShell:
+3. Click and follow the steps in GCP CloudShell, entering the configuration parameters when prompted:
 
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/Twingate-Labs/tg-group-profile-manager)
 
