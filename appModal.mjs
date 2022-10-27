@@ -30,14 +30,14 @@ export const openModal = async (profileConfig, profile, userEmail, tgUser) => {
                             "type": "plain_text",
                             "text": "No Group",
                         },
-                        "value": `${profile.profileName}++no_group++${userEmail}`
+                        value: JSON.stringify([profile.profileName, "no_group"])
                     }],
                     initial_option: {
                         "text": {
                             "type": "plain_text",
                             "text": "No Group",
                         },
-                        "value": `${profile.profileName}++no_group++${userEmail}`
+                        value: JSON.stringify([profile.profileName, "no_group"])
                     }
                 }
             }
