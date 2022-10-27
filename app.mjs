@@ -58,7 +58,7 @@ async function initApp(app) {
 
     // Called when user selects a profile
     app.action('select_profile', async ({ body, client, context, ack }) => {
-        ack();
+        await ack();
         try {
             const slackUserInfo = await client.users.info({user: body.user.id});
             const userEmail = slackUserInfo.user.profile.email;
@@ -68,7 +68,6 @@ async function initApp(app) {
             if ( requestedProfile === undefined) throw new Error(`Profile not found.`)
 
             const profileManager = new SlackProfileManager()
-            await profileManager.init()
             const tgUser = await profileManager.lookupUserGroupByEmail(userEmail);
             const userGroupNames = tgUser.groups.edges.map(group => group.node.name)
 
@@ -89,12 +88,12 @@ async function initApp(app) {
 
     // dummy action watcher for multi static select
     app.action('change_group', async ({ body, context, ack }) => {
-        ack();
+        await ack();
     });
 
     // called when a user submits a oneOf profile change
     app.view('submit_active_group_change', async ({ body, client, logger,context, ack }) => {
-        ack();
+        await ack();
         const selectedOption = Object.values(Object.values(body.view.state.values)[0])[0].selected_option;
         const [requestedProfileName, selectedGroup] = JSON.parse(selectedOption.value)
         try {
@@ -106,7 +105,6 @@ async function initApp(app) {
             if ( requestedProfile === undefined) throw new Error(`Profile not found.`)
 
             const profileManager = new SlackProfileManager()
-            await profileManager.init()
             const tgUser = await profileManager.lookupUserGroupByEmail(userEmail);
             const userGroupNames = tgUser.groups.edges.map(group => group.node.name)
 

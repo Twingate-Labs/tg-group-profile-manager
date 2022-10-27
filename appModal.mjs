@@ -70,7 +70,6 @@ const GroupNameToIdMap = {};
 // Apply oneOf profile change
 export const submitChange = async (profileConfig, userEmail, profile, selectedGroup, tgUser) => {
     const profileManager = new SlackProfileManager()
-    await profileManager.init()
     const userId = tgUser.id
     const userGroups = tgUser.groups.edges.map(group => group.node)
     for (const group of userGroups){

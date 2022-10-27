@@ -8,7 +8,6 @@ export const createHome = async(profileConfig, userEmail) => {
     // Note: iterate profiles might be better solution here as it can flag the groups with the same name.
     // Note: though the method used below is using less API calls
     const profileManager = new SlackProfileManager()
-    await profileManager.init()
     const userWithGroups = await profileManager.lookupUserGroupByEmail(userEmail);
     const view = {
         "type": "home",

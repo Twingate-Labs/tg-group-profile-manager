@@ -13,14 +13,10 @@ if (process.env.DEPLOY_ENV !== "docker") {
 
 export class SlackProfileManager {
     constructor () {
-    }
-
-    async init() {
         this.apiClient = new TwingateApiClient(tgAccount, tgApiKey, {
             applicationName
         });
     }
-
 
     // todo: only gets first 50 groups
     async lookupUserGroupByEmail(email) {
