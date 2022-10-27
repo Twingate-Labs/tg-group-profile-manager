@@ -14,7 +14,7 @@ async function initApp(app) {
     if (process.env.DEPLOY_ENV !== "docker") {
         profileConfig = JSON.parse(await accessSecretVersion('tg-group-profile-manager-profile-config'));
     } else {
-        profileConfig = JSON.parse(process.env.PROFILE_CONFIG);
+        profileConfig = JSON.parse(process.env.PROFILE_CONFIG.replace("'", ""));
     }
 
     // Set defaults
