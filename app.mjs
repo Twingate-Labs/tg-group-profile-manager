@@ -8,7 +8,7 @@ const {App} = boltPkg;
 dotenvPkg.config();
 
 async function initApp(app) {
-    // fetching secrete from google cloud
+    // fetching secret from google cloud
     //todo: centralise all accessSecretVersion
     let profileConfig = ""
     if (process.env.DEPLOY_ENV !== "docker") {
@@ -139,14 +139,14 @@ async function initApp(app) {
 
 (async () => {
     const port = 8080
-    let [slackToken, slackSigningSecrete] = [
+    let [slackToken, slackSigningSecret] = [
         process.env.SLACK_BOT_TOKEN,
         process.env.SLACK_SIGNING_SECRET
     ]
-    // fetching secrete from google cloud
+    // fetching secret from google cloud
     //todo: centralise all accessSecretVersion
     if (process.env.DEPLOY_ENV !== "docker") {
-        [slackToken, slackSigningSecrete] = [
+        [slackToken, slackSigningSecret] = [
             await accessSecretVersion('tg-group-profile-manager-bot-token'),
             await accessSecretVersion('tg-group-profile-manager-client-signing-secret')
         ]
@@ -156,7 +156,7 @@ async function initApp(app) {
 
     const app = new App({
         token: slackToken,
-        signingSecret: slackSigningSecrete
+        signingSecret: slackSigningSecret
     });
     await initApp(app);
     await app.start(process.env.PORT || port);
