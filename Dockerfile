@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:18
 
 # Install app dependencies.
 WORKDIR /usr/src/app
