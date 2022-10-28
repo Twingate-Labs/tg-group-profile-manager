@@ -1,7 +1,7 @@
 #!/bin/sh
 ## Import environment variables
 ## Tell the container to run as CloudRun
-#export DEPLOY_ENV=cloudrun
+export DEPLOY_ENV=docker
 export PROJECT_ID=$GOOGLE_CLOUD_PROJECT
 gcloud config set run/region "$GOOGLE_CLOUD_REGION"
 export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)' --filter 'NAME:Compute Engine default service account' --project "$PROJECT_ID")
