@@ -18,13 +18,18 @@ export class SlackProfileManager {
         });
     }
 
-    // todo: only gets first 50 groups
     async lookupUserGroupByEmail(email) {
-        const query = "query UserByEmail($email:String){users(filter:{email:{eq:$email}}){edges{node{id groups{edges{node{id name}}}}}}}";
+        const query = "query UserByEmail($email:String){users(filter:{email:{eq:$email}}){edges{node{id groups{pageInfo{hasNextPage endCursor} edges{node{id name}}}}}}}";
         let response = await this.apiClient.exec(query, {email: ""+email.trim()});
         let result = response.users;
         if ( result == null || result.edges == null || result.edges.length < 1 ) return null;
-        return result.edges[0].node;
+        let user = result.edges[0].node;
+        if ( user.groups.pageInfo.hasNextPage === true ) {
+            let groupQuery = this.apiClient.getRootNodePagedQuery("UserGroups", "user", "groups", ["id", "name"])
+            let groupResults = await this.apiClient.fetchAllRootNodePages(groupQuery, {id: user.id, pageInfo: user.groups.pageInfo});
+            for ( const group of groupResults ) user.groups.edges.push({node: group})
+        }
+        return user;
     }
 
 
