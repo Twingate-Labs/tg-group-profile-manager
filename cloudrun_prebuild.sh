@@ -12,9 +12,11 @@ export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)
 ## Set the current user as secretmanager.admin to the project
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=user:$(gcloud auth list --format 'value(account)') --role=roles/secretmanager.admin
 
+## Giving the service account the secretmanager.secretAccessor role to the project
+gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/secretmanager.secretAccessor
+
 ## Enable and setup secret manager
 gcloud services enable secretmanager.googleapis.com
-gcloud projects add-iam-policy-binding "$PROJECT_ID" --member=user:$(gcloud auth list --format 'value(account)') --role=roles/secretmanager.admin
 echo -n $SLACK_BOT_TOKEN | gcloud secrets create tg-group-profile-manager-bot-token --project "$PROJECT_ID" --replication-policy=automatic --data-file=-
 echo -n $SLACK_SIGNING_SECRET | gcloud secrets create tg-group-profile-manager-client-signing-secret --project "$PROJECT_ID" --replication-policy=automatic --data-file=-
 echo -n $TG_API_KEY | gcloud secrets create tg-group-profile-manager-tg-api-key --project "$PROJECT_ID" --replication-policy=automatic --data-file=-
