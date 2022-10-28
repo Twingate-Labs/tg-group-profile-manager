@@ -54,6 +54,5 @@ For a manual deployment you may instead follow the [manual instructions](./docs/
 
 ### Current limitations & known issues
 1. When there are Twingate groups with duplicate names, only the first group returned by the Twingate API is used. To prevent this, ensure there are no duplicate group names in the Twingate network.
-2. If a user is part of more than 50 Twingate groups, only the first 50 Twingate groups returned by the Twingate API is used. To prevent this, ensure there are no users part of more than 50 groups in the Twingate network.
 3. The Slack users' email addresses needs to be the same as their Twingate email address.
 4. Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect but please advise end-users that this process can take ~20 seconds to pass through to connected clients.
