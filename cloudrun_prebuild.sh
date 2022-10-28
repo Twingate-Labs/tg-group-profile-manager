@@ -9,9 +9,8 @@ gcloud config set run/region "$GOOGLE_CLOUD_REGION"
 gcloud config set project "$GOOGLE_CLOUD_PROJECT"
 export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)' --filter 'NAME:Compute Engine default service account' --project "$PROJECT_ID") ## "NAME:$SERVICE_ACCOUNT_NAME"
 
-## Set the current user as secretmanager.admin
+## Set the current user as secretmanager.admin to the project
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=user:$(gcloud auth list --format 'value(account)') --role=roles/secretmanager.admin
-
 
 ## Enable and setup secret manager
 gcloud services enable secretmanager.googleapis.com
