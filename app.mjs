@@ -7,7 +7,7 @@ import {accessSecretVersion} from "./utils.mjs";
 const {App} = boltPkg;
 dotenvPkg.config();
 
-async function initApp(app) {
+async function loadProfiles(app) {
     // fetching secret from google cloud
     //todo: centralise all accessSecretVersion
     let profileConfig = ""
@@ -37,7 +37,17 @@ async function initApp(app) {
             console.warn(`No groups set in config for profile '${profile.profileName}'`);
             profile.groups = [];
         }
-    })
+    });
+    profileConfig.profiles = profileConfig.profiles.map( (profile, index) => {
+        switch (profile.profileType) {
+            case "oneOf": return new OneOfProfile(app, profileConfig, index);
+            default: return profile;
+        }
+    });
+    return profileConfig;
+}
+async function initApp(app) {
+    const profileConfig = await loadProfiles(app);
 
     const refreshHome = async function (userId, userEmail) {
         const homeView = await createHome(profileConfig, userEmail);
@@ -66,8 +76,6 @@ async function initApp(app) {
         await ack();
     });
 
-
-    const oneOfProfileHandler = new OneOfProfile(app, profileConfig);
 }
 
 
