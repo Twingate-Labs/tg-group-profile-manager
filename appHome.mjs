@@ -62,7 +62,7 @@ export const createHome = async(profileConfig, userEmail) => {
             },
             "accessory": {
                 "type": "button",
-                "action_id": "select_profile",
+                "action_id": `select_profile-${permittedProfile.profileType}`,
                 "text": {
                     "type": "plain_text",
                     "emoji": true,

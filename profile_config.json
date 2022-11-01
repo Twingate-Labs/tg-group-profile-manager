@@ -1,27 +1,38 @@
-  {
-    "profiles": [
-      {
-        "profileName": "Example Profile 1",
-        "profileType": "oneOf",
-        "groups": [
-          "Prod",
-          "Preprod",
-          "Testing"
-        ],
-        "applicableToGroup": "Everyone"
-      },
-      {
-        "profileName": "Example Profile 2",
-        "profileType": "oneOf",
-        "groups": [
-          "US",
-          "EU",
-          "ASIA"
-        ],
-        "applicableToGroup": "Everyone"
-      }
-    ],
-    "groupPermissions": {
-      "Prod": "Admin"
+{
+  "profiles": [
+    {
+      "profileName": "Example Profile 1",
+      "profileType": "oneOf",
+      "groups": [
+        "Prod",
+        "Preprod",
+        "Testing"
+      ],
+      "applicableToGroup": "Everyone"
+    },
+    {
+      "profileName": "Example Profile 2",
+      "profileType": "oneOf",
+      "groups": [
+        "US",
+        "EU",
+        "ASIA"
+      ],
+      "applicableToGroup": "Everyone"
+    },
+    {
+      "profileName": "Self-serve business approvals",
+      "profileType": "selfServeApproval",
+      "groups": [
+        "HR",
+        "Finance",
+        "Sales"
+      ],
+      "applicableToGroup": "Everyone",
+      "approvers": ["emrul@twingate.com", "chen@twingate.com"]
     }
+  ],
+  "groupPermissions": {
+    "Prod": "Admin"
   }
+}
