@@ -37,7 +37,7 @@ Please prepare the following configuration parameters (refer to the [example fil
     - All configuration parameters from the `Configuration` section above
     - `PROJECT_ID` GCP Project (will be passed to container for it to access secrets)
     - Google Cloud project owner
-3. Click and follow the steps in GCP CloudShell, entering the configuration parameters when prompted:
+2. Click and follow the steps in GCP CloudShell, entering the configuration parameters when prompted:
 
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/Twingate-Labs/tg-group-profile-manager)
 

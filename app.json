@@ -22,7 +22,7 @@
             "order": 40
         },
         "PROFILE_CONFIG": {
-            "description": "Profile configuration (must be valid JSON)",
+            "description": "Profile configuration (must be valid single line JSON)",
             "required": true,
             "order": 50
         },
