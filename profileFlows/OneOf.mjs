@@ -171,7 +171,7 @@ export class OneOfProfile {
         ;
 
         if (groupNamesToRemove.length > 0) {
-            console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - removing group(s): ${groupNamesToRemove.join(",")}.`);
+            console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - removing group(s): ${groupNamesToRemove.map(g=>`'${g}'`).join(", ")}.`);
             const groupsIdsToRemove = await Promise.all(groupNamesToRemove.map(groupName => profileManager.lookupGroupByName(groupName)));
             await Promise.all(groupsIdsToRemove.map(groupId => profileManager.removeUserFromGroup(groupId, tgUser.id)));
         } else {
