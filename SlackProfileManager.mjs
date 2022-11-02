@@ -11,6 +11,8 @@ if (process.env.DEPLOY_ENV !== "docker") {
     tgApiKey = await accessSecretVersion('tg-group-profile-manager-tg-api-key')
 }
 
+const GroupNameToIdMap = {};
+
 export class SlackProfileManager {
     constructor () {
         this.apiClient = new TwingateApiClient(tgAccount, tgApiKey, {
@@ -31,6 +33,9 @@ export class SlackProfileManager {
             for ( const group of groupResults ) user.groups.edges.push({node: group})
         }
         user.groups = user.groups.edges.map(group => group.node);
+        // Just cache every group for now
+        for ( const group of user.groups ) GroupNameToIdMap[group.name] = group.id;
+        user.email = email;
         return user;
     }
 
@@ -40,11 +45,14 @@ export class SlackProfileManager {
     }
 
     async lookupGroupByName(name) {
+        if ( GroupNameToIdMap[name] ) return GroupNameToIdMap[name];
         const query = "query GroupByName($name:String){groups(filter:{name:{eq:$name}}){edges{node{id}}}}";
         let response = await this.apiClient.exec(query, {name: ""+name.trim()});
         let result = response.groups;
-        if ( result == null || result.edges == null || result.edges.length < 1 ) return null;
-        return result.edges[0].node.id;
+        if ( result.edges.length < 1 ) throw new Error(`Group not found in Twingate: '${name}'`);
+        const group = result.edges[0].node;
+        if ( group.id != null ) GroupNameToIdMap[group] = group.id;
+        return group.id;
     }
 
     async lookupUserByEmail(email) {

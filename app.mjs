@@ -3,6 +3,7 @@ import {createHome} from "./appHome.mjs";
 import {OneOfProfile} from "./profileFlows/OneOf.mjs";
 import dotenvPkg from 'dotenv';
 import {accessSecretVersion} from "./utils.mjs";
+import {SlackProfileManager} from "./SlackProfileManager.mjs";
 
 const {App} = boltPkg;
 dotenvPkg.config();
@@ -46,6 +47,7 @@ async function loadProfiles(app) {
     });
     return profileConfig;
 }
+
 async function initApp(app) {
     const profileConfig = await loadProfiles(app);
 
@@ -56,7 +58,17 @@ async function initApp(app) {
             "view": homeView
         });
     }
+
+    const lookupTgUserFromSlackUserId = async function(userId) {
+        const slackUserInfo = await app.client.users.info({user: userId});
+        const userEmail = slackUserInfo.user.profile.email;
+
+        const profileManager = new SlackProfileManager()
+        return await profileManager.lookupUserGroupByEmail(userEmail);
+    }
+
     app.refreshHome = refreshHome;
+    app.lookupTgUserFromSlackUserId = lookupTgUserFromSlackUserId;
 
 
     // Listen for users opening your App Home

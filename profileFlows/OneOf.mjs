@@ -1,12 +1,10 @@
 import {SlackProfileManager} from "../SlackProfileManager.mjs";
 import {createHome} from "../appHome.mjs";
 
-
-const GroupNameToIdMap = {};
-
-
 export class OneOfProfile {
     constructor(app, profileConfig, index) {
+        this.profileName = "";
+        this.groups = [];
         Object.assign(this, profileConfig.profiles[index]);
         this.profileIndex = index;
         this.profileConfig = profileConfig;
@@ -45,19 +43,15 @@ export class OneOfProfile {
     async selectProfile({body, client, context, ack}) {
         await ack();
         try {
-            const slackUserInfo = await client.users.info({user: body.user.id});
-            const userEmail = slackUserInfo.user.profile.email;
-
-            const profileManager = new SlackProfileManager()
-            const tgUser = await profileManager.lookupUserGroupByEmail(userEmail);
+            const tgUser = await this.app.lookupTgUserFromSlackUserId(body.user.id);
             const userGroupNames = tgUser.groups.map(group => group.name)
 
             // Make sure user is allowed to access profile
             if (!userGroupNames.includes(this.applicableToGroup)) {
-                throw new Error(`User '${userEmail}' has no access to profile '${this.profileName}'`);
+                throw new Error(`User '${tgUser.email}' has no access to profile '${this.profileName}'`);
             }
 
-            const view = await this.openModal(userEmail, tgUser);
+            const view = await this.openModal(tgUser);
             const result = await this.app.client.views.open({
                 token: context.botToken,
                 trigger_id: body.trigger_id,
@@ -70,9 +64,7 @@ export class OneOfProfile {
     }
 
     // Called when a user opens a profile - get configuration for profile and shot it in a modal
-    async openModal(userEmail, tgUser) {
-
-
+    async openModal(tgUser) {
         let modal = {
             type: 'modal',
             callback_id: `submit_profile-${this.profileIndex}`,
@@ -100,14 +92,14 @@ export class OneOfProfile {
                                 "type": "plain_text",
                                 "text": "No Group",
                             },
-                            value: JSON.stringify(["no_group"])
+                            value: JSON.stringify([-1])
                         }],
                         initial_option: {
                             "text": {
                                 "type": "plain_text",
                                 "text": "No Group",
                             },
-                            value: JSON.stringify(["no_group"])
+                            value: JSON.stringify([-1])
                         }
                     }
                 }
@@ -141,36 +133,31 @@ export class OneOfProfile {
         const selectedOption = Object.values(Object.values(body.view.state.values)[0])[0].selected_option;
         const [selectedGroup] = JSON.parse(selectedOption.value)
         try {
-            // TODO: can refactor this security checking into a reusable function
-            const slackUserInfo = await client.users.info({user: body.user.id});
-            const userEmail = slackUserInfo.user.profile.email;
-
-            const profileManager = new SlackProfileManager()
-            const tgUser = await profileManager.lookupUserGroupByEmail(userEmail);
+            const tgUser = await this.app.lookupTgUserFromSlackUserId(body.user.id);
             const userGroupNames = tgUser.groups.map(group => group.name)
 
             // Make sure user is allowed to access profile
             if (!userGroupNames.includes(this.applicableToGroup)) {
-                throw new Error(`User '${userEmail}' has no access to profile '${this.profileName}'`);
+                throw new Error(`User '${tgUser.email}' has no access to profile '${this.profileName}'`);
             }
 
             // Make sure user is allowed to access selected group
-            if (!this.groups.includes(selectedGroup) && selectedGroup !== "no_group") {
-                throw new Error(`User '${userEmail}' not allowed to access requested group '${selectedGroup}' in profile '${this.profileName}'`);
+            if ( typeof selectedGroup === "string" && !this.groups.includes(selectedGroup) ) {
+                throw new Error(`User '${tgUser.email}' not allowed to access requested group '${selectedGroup}' in profile '${this.profileName}'`);
             }
 
             if (typeof this.profileConfig.groupPermissions[selectedGroup] === "string") {
                 // Switching to this group requires that user is already in another group, exit if they don't have permission
                 if (!userGroupNames.includes(this.profileConfig.groupPermissions[selectedGroup])) {
-                    throw new Error(`User '${userEmail}' has no access to group '${selectedGroup}' in profile '${this.profileName}' because they are not a member of required group '${this.profileConfig.groupPermissions[selectedGroup]}'`)
+                    throw new Error(`User '${tgUser.email}' has no access to group '${selectedGroup}' in profile '${this.profileName}' because they are not a member of required group '${this.profileConfig.groupPermissions[selectedGroup]}'`)
                 }
             }
 
-            await this.submitChange(userEmail, selectedGroup, tgUser);
+            await this.submitChange(selectedGroup, tgUser);
 
-            await this.app.refreshHome(body.user.id, userEmail);
+            await this.app.refreshHome(body.user.id, tgUser.email);
 
-            logger.info(`User '${userEmail}' changed profile '${this.profileName}' to group '${selectedGroup}'`)
+            logger.info(`User '${tgUser.email}' changed profile '${this.profileName}' to group '${selectedGroup}'`)
         } catch (error) {
             logger.error(error);
         }
@@ -178,58 +165,29 @@ export class OneOfProfile {
     }
 
     // Apply oneOf profile change
-    async submitChange(userEmail, selectedGroup, tgUser) {
-        const profileManager = new SlackProfileManager()
-        const userId = tgUser.id
-        for (const group of tgUser.groups) {
-            GroupNameToIdMap[group.name] = group.id
+    async submitChange(selectedGroup, tgUser) {
+        const profileManager = new SlackProfileManager(),
+              userGroupNames = tgUser.groups.map(userGroup => userGroup.name),
+              groupNamesToRemove = this.groups.filter(group => group !== selectedGroup && userGroupNames.includes(group))
+        ;
+
+        if ( groupNamesToRemove.length > 0 ) {
+            console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - removing group(s): ${groupNamesToRemove.join(",")}.`);
+            const groupsIdsToRemove = await Promise.all( groupNamesToRemove.map( groupName => profileManager.lookupGroupByName(groupName)) );
+            await Promise.all(groupsIdsToRemove.map( groupId => profileManager.removeUserFromGroup(groupId, tgUser.id)));
+        }
+        else {
+            console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - no groups to remove.`);
         }
 
-        let response = ""
-        const userGroupNames = tgUser.groups.map(userGroup => userGroup.name)
-        switch (selectedGroup) {
-            case "no_group":
-                for (const group of this.groups) {
-                    if (userGroupNames.includes(group)) {
-                        const groupId = GroupNameToIdMap[group] || await profileManager.lookupGroupByName(group)
-                        if ( groupId == null ) throw new Error(`Group not found in Twingate: '${group}'`);
-                        GroupNameToIdMap[group] = groupId
-                        response = await profileManager.removeUserFromGroup(groupId, userId);
-                        console.log(`User '${userEmail}' in profile '${this.profileName}' group '${group}', removing user from group.`)
-                    } else {
-                        console.log(`User '${userEmail}' not in profile '${this.profileName}' group '${group}', skipping removal.`)
-                    }
-                }
-                break;
-            default:
-                const groupToAdd = selectedGroup
-                const groupToRemove = this.groups.filter(group => group !== selectedGroup)
-
-                // remove user from groups
-                for (const group of groupToRemove) {
-                    // Can wrap this up to avoid the duplicated code
-                    if (userGroupNames.includes(group)) {
-                        const groupId = GroupNameToIdMap[group] || await profileManager.lookupGroupByName(group);
-                        if ( groupId == null ) throw new Error(`Group not found in Twingate: '${group}'`);
-                        GroupNameToIdMap[group] = groupId
-                        response = await profileManager.removeUserFromGroup(groupId, userId);
-                        console.log(`User '${userEmail}' in profile '${this.profileName}' group '${group}', removing user from group.`)
-                    } else {
-                        console.log(`User '${userEmail}' not in profile '${this.profileName}' group '${group}', skipping removal.`)
-                    }
-                }
-
-                // add user to group
-                if (userGroupNames.includes(groupToAdd)) {
-                    console.log(`User '${userEmail}' in profile '${this.profileName}' group '${groupToAdd}', skipping adding.`)
-                } else {
-                    const groupId = GroupNameToIdMap[groupToAdd] || await profileManager.lookupGroupByName(groupToAdd)
-                    if ( groupId == null ) throw new Error(`Group not found in Twingate: '${groupToAdd}'`);
-                    GroupNameToIdMap[groupToAdd] = groupId
-                    response = await profileManager.addUserToGroup(groupId, userId);
-                    console.log(`User '${userEmail}' not in profile '${this.profileName}' group '${groupToAdd}', adding user to group.`)
-                }
-
+        if ( typeof selectedGroup === "string" && !userGroupNames.includes(selectedGroup)) {
+            console.log(`User '${tgUser.email}' in profile '${this.profileName}' - adding group: ${selectedGroup}.`);
+            const groupId = await profileManager.lookupGroupByName(selectedGroup);
+            await profileManager.addUserToGroup(groupId, tgUser.id)
         }
+        else {
+            console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - no group to add.`);
+        }
+
     };
 }
