@@ -1,14 +1,10 @@
 import {SlackProfileManager} from "../SlackProfileManager.mjs";
-import {createHome} from "../appHome.mjs";
+import {BaseProfile} from "./BaseProfile.mjs";
 
-export class OneOfProfile {
+export class OneOfProfile extends BaseProfile {
     constructor(app, profileConfig, index) {
-        this.profileName = "";
-        this.groups = [];
-        Object.assign(this, profileConfig.profiles[index]);
-        this.profileIndex = index;
-        this.profileConfig = profileConfig;
-        this.app = app;
+        super(app, profileConfig, index)
+        this.groups = this.groups || [];
         // Called when user selects a oneOf profile
         app.action(`select_profile-${index}`, this.selectProfile.bind(this));
 
@@ -24,7 +20,7 @@ export class OneOfProfile {
             currentActiveGroupsString = "None"
         }
 
-        const block = {
+        return {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
@@ -41,10 +37,9 @@ export class OneOfProfile {
                 "value": `${this.profileName}`
             }
         }
-        return block;
     }
 
-    async selectProfile({body, client, context, ack}) {
+    async selectProfile({body, context, ack, logger}) {
         await ack();
         try {
             const tgUser = await this.app.lookupTgUserFromSlackUserId(body.user.id);
@@ -52,18 +47,18 @@ export class OneOfProfile {
 
             // Make sure user is allowed to access profile
             if (!userGroupNames.includes(this.applicableToGroup)) {
-                throw new Error(`User '${tgUser.email}' has no access to profile '${this.profileName}'`);
+                logger.error(new Error(`User '${tgUser.email}' has no access to profile '${this.profileName}'`));
+                return;
             }
 
             const view = await this.openModal(tgUser);
-            const result = await this.app.client.views.open({
+            await this.app.client.views.open({
                 token: context.botToken,
                 trigger_id: body.trigger_id,
                 view: view
             })
         } catch (e) {
-            console.log(e)
-            this.app.error(e)
+            logger.error(e);
         }
     }
 
@@ -128,7 +123,7 @@ export class OneOfProfile {
     }
 
     // Called when user clicks to submit a profile change
-    async submitProfileChange({body, client, logger, context, ack}) {
+    async submitProfileChange({body, logger, ack}) {
         await ack();
         const selectedOption = Object.values(Object.values(body.view.state.values)[0])[0].selected_option;
         const [selectedGroup] = JSON.parse(selectedOption.value)
@@ -138,18 +133,21 @@ export class OneOfProfile {
 
             // Make sure user is allowed to access profile
             if (!userGroupNames.includes(this.applicableToGroup)) {
-                throw new Error(`User '${tgUser.email}' has no access to profile '${this.profileName}'`);
+                logger.error(new Error(`User '${tgUser.email}' has no access to profile '${this.profileName}'`));
+                return;
             }
 
             // Make sure user is allowed to access selected group
             if (typeof selectedGroup === "string" && !this.groups.includes(selectedGroup)) {
-                throw new Error(`User '${tgUser.email}' not allowed to access requested group '${selectedGroup}' in profile '${this.profileName}'`);
+                logger.error(new Error(`User '${tgUser.email}' not allowed to access requested group '${selectedGroup}' in profile '${this.profileName}'`));
+                return;
             }
 
             if (typeof this.profileConfig.groupPermissions[selectedGroup] === "string") {
                 // Switching to this group requires that user is already in another group, exit if they don't have permission
                 if (!userGroupNames.includes(this.profileConfig.groupPermissions[selectedGroup])) {
-                    throw new Error(`User '${tgUser.email}' has no access to group '${selectedGroup}' in profile '${this.profileName}' because they are not a member of required group '${this.profileConfig.groupPermissions[selectedGroup]}'`)
+                    logger.error(new Error(`User '${tgUser.email}' has no access to group '${selectedGroup}' in profile '${this.profileName}' because they are not a member of required group '${this.profileConfig.groupPermissions[selectedGroup]}'`));
+                    return;
                 }
             }
 
