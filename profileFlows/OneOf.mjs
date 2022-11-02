@@ -19,7 +19,9 @@ export class OneOfProfile {
     async getAppHomeBlock(tgUser) {
         const currentActiveGroups = this.groups.filter(group => tgUser.groups.map(userGroup => userGroup.name).includes(group))
         let currentActiveGroupsString = currentActiveGroups.join(", ")
-        if (!currentActiveGroupsString) currentActiveGroupsString = "None"
+        if (!currentActiveGroupsString) {
+            currentActiveGroupsString = "None"
+        }
 
         const block = {
             "type": "section",
@@ -40,6 +42,7 @@ export class OneOfProfile {
         }
         return block;
     }
+
     async selectProfile({body, client, context, ack}) {
         await ack();
         try {
@@ -65,6 +68,14 @@ export class OneOfProfile {
 
     // Called when a user opens a profile - get configuration for profile and shot it in a modal
     async openModal(tgUser) {
+
+        const noGroupOption = {
+            "text": {
+                "type": "plain_text",
+                "text": "No Group",
+            },
+            value: JSON.stringify([-1])
+        };
         let modal = {
             type: 'modal',
             callback_id: `submit_profile-${this.profileIndex}`,
@@ -87,20 +98,8 @@ export class OneOfProfile {
                     accessory: {
                         type: "static_select",
                         action_id: "change_group",
-                        options: [{
-                            "text": {
-                                "type": "plain_text",
-                                "text": "No Group",
-                            },
-                            value: JSON.stringify([-1])
-                        }],
-                        initial_option: {
-                            "text": {
-                                "type": "plain_text",
-                                "text": "No Group",
-                            },
-                            value: JSON.stringify([-1])
-                        }
+                        options: [noGroupOption],
+                        initial_option: noGroupOption
                     }
                 }
             ]
@@ -142,7 +141,7 @@ export class OneOfProfile {
             }
 
             // Make sure user is allowed to access selected group
-            if ( typeof selectedGroup === "string" && !this.groups.includes(selectedGroup) ) {
+            if (typeof selectedGroup === "string" && !this.groups.includes(selectedGroup)) {
                 throw new Error(`User '${tgUser.email}' not allowed to access requested group '${selectedGroup}' in profile '${this.profileName}'`);
             }
 
@@ -167,25 +166,23 @@ export class OneOfProfile {
     // Apply oneOf profile change
     async submitChange(selectedGroup, tgUser) {
         const profileManager = new SlackProfileManager(),
-              userGroupNames = tgUser.groups.map(userGroup => userGroup.name),
-              groupNamesToRemove = this.groups.filter(group => group !== selectedGroup && userGroupNames.includes(group))
+            userGroupNames = tgUser.groups.map(userGroup => userGroup.name),
+            groupNamesToRemove = this.groups.filter(group => group !== selectedGroup && userGroupNames.includes(group))
         ;
 
-        if ( groupNamesToRemove.length > 0 ) {
+        if (groupNamesToRemove.length > 0) {
             console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - removing group(s): ${groupNamesToRemove.join(",")}.`);
-            const groupsIdsToRemove = await Promise.all( groupNamesToRemove.map( groupName => profileManager.lookupGroupByName(groupName)) );
-            await Promise.all(groupsIdsToRemove.map( groupId => profileManager.removeUserFromGroup(groupId, tgUser.id)));
-        }
-        else {
+            const groupsIdsToRemove = await Promise.all(groupNamesToRemove.map(groupName => profileManager.lookupGroupByName(groupName)));
+            await Promise.all(groupsIdsToRemove.map(groupId => profileManager.removeUserFromGroup(groupId, tgUser.id)));
+        } else {
             console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - no groups to remove.`);
         }
 
-        if ( typeof selectedGroup === "string" && !userGroupNames.includes(selectedGroup)) {
+        if (typeof selectedGroup === "string" && !userGroupNames.includes(selectedGroup)) {
             console.log(`User '${tgUser.email}' in profile '${this.profileName}' - adding group: ${selectedGroup}.`);
             const groupId = await profileManager.lookupGroupByName(selectedGroup);
             await profileManager.addUserToGroup(groupId, tgUser.id)
-        }
-        else {
+        } else {
             console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - no group to add.`);
         }
 
