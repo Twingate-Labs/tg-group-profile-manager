@@ -17,7 +17,8 @@ export class OneOfProfile {
     }
 
     async getAppHomeBlock(tgUser) {
-        const currentActiveGroups = this.groups.filter(group => tgUser.groups.map(userGroup => userGroup.name).includes(group))
+        const userGroupNames = tgUser.groups.map(group => group.name);
+        const currentActiveGroups = this.groups.filter(group => userGroupNames.includes(group))
         let currentActiveGroupsString = currentActiveGroups.join(", ")
         if (!currentActiveGroupsString) {
             currentActiveGroupsString = "None"
@@ -47,7 +48,7 @@ export class OneOfProfile {
         await ack();
         try {
             const tgUser = await this.app.lookupTgUserFromSlackUserId(body.user.id);
-            const userGroupNames = tgUser.groups.map(group => group.name)
+            const userGroupNames = tgUser.groups.map(group => group.name);
 
             // Make sure user is allowed to access profile
             if (!userGroupNames.includes(this.applicableToGroup)) {
