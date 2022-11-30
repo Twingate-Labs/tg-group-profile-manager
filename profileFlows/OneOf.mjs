@@ -24,7 +24,7 @@ export class OneOfProfile extends BaseProfile {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": `*Profile: ${this.profileName}*\nCurrent Group: ${currentActiveGroupsString}`
+                "text": `*Profile: ${this.profileName}* (One-Of)\nCurrent Group: ${currentActiveGroupsString}`
             },
             "accessory": {
                 "type": "button",

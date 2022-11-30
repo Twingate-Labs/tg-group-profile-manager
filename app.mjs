@@ -4,6 +4,7 @@ import {OneOfProfile} from "./profileFlows/OneOf.mjs";
 import dotenvPkg from 'dotenv';
 import {accessSecretVersion} from "./utils.mjs";
 import {SlackProfileManager} from "./SlackProfileManager.mjs";
+import {SelfServeApproval} from "./profileFlows/SelfServeApproval.mjs";
 
 const {App} = boltPkg;
 dotenvPkg.config();
@@ -42,6 +43,7 @@ async function loadProfiles(app) {
     profileConfig.profiles = profileConfig.profiles.map( (profile, index) => {
         switch (profile.profileType) {
             case "oneOf": return new OneOfProfile(app, profileConfig, index);
+            case "selfServeApproval": return new SelfServeApproval(app, profileConfig, index);
             default: return profile;
         }
     });

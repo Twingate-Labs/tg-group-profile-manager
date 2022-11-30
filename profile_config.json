@@ -29,7 +29,7 @@
         "Sales"
       ],
       "applicableToGroup": "Everyone",
-      "approvers": ["emrul@twingate.com", "chen@twingate.com"]
+      "approverGroup": ["Everyone"]
     }
   ],
   "groupPermissions": {
