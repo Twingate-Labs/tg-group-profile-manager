@@ -1,7 +1,7 @@
 {
   "profiles": [
     {
-      "profileName": "Example Profile 1",
+      "profileName": "Example One Of Profile 1",
       "profileType": "oneOf",
       "groups": [
         "Prod",
@@ -11,7 +11,7 @@
       "applicableToGroup": "Everyone"
     },
     {
-      "profileName": "Example Profile 2",
+      "profileName": "Example One Of Profile 2",
       "profileType": "oneOf",
       "groups": [
         "US",
@@ -21,7 +21,7 @@
       "applicableToGroup": "Everyone"
     },
     {
-      "profileName": "Self-serve business approvals",
+      "profileName": "Example Self-Serve Business Approvals",
       "profileType": "selfServeApproval",
       "groups": [
         "HR",
@@ -29,7 +29,7 @@
         "Sales"
       ],
       "applicableToGroup": "Everyone",
-      "approverGroup": ["Everyone"]
+      "approverGroup": "IT"
     }
   ],
   "groupPermissions": {

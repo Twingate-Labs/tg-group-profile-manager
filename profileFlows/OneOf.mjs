@@ -123,7 +123,7 @@ export class OneOfProfile extends BaseProfile {
     }
 
     // Called when user clicks to submit a profile change
-    async submitProfileChange({body, logger, ack}) {
+    async submitProfileChange({client, body, logger, ack}) {
         await ack();
         const selectedOption = Object.values(Object.values(body.view.state.values)[0])[0].selected_option;
         const [selectedGroup] = JSON.parse(selectedOption.value)
@@ -151,7 +151,7 @@ export class OneOfProfile extends BaseProfile {
                 }
             }
 
-            await this.submitChange(selectedGroup, tgUser);
+            await this.submitChange(client, selectedGroup, tgUser, body.user.id);
 
             await this.app.refreshHome(body.user.id, tgUser.email);
 
@@ -163,7 +163,7 @@ export class OneOfProfile extends BaseProfile {
     }
 
     // Apply oneOf profile change
-    async submitChange(selectedGroup, tgUser) {
+    async submitChange(client, selectedGroup, tgUser, slackUserId) {
         const profileManager = new SlackProfileManager(),
             userGroupNames = tgUser.groups.map(userGroup => userGroup.name),
             groupNamesToRemove = this.groups.filter(group => group !== selectedGroup && userGroupNames.includes(group))
@@ -184,6 +184,23 @@ export class OneOfProfile extends BaseProfile {
         } else {
             console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - no group to add.`);
         }
+
+        // sending group change message to user
+        const messageString = `The active group of the profile _'${this.profileName}'_ has been changed to _'${selectedGroup}'._ \n\n _Note: Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect and this process can take ~20 seconds to pass through to connected clients._`
+        let msgOption = {
+            channel: slackUserId,
+            text: messageString,
+            blocks: [
+                {
+                    type: 'section',
+                    text: {
+                        type: 'mrkdwn',
+                        text: messageString
+                    }
+                }
+            ]
+        }
+        await client.chat.postMessage(msgOption)
 
     };
 }

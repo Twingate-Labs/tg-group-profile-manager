@@ -85,11 +85,15 @@ async function initApp(app) {
     });
 
 
-    // dummy action watcher for multi static select
+    // dummy action watcher for static select
     app.action('change_group', async ({body, context, ack}) => {
         await ack();
     });
 
+    // dummy action watcher for group access request
+    app.action('request_access', async ({body, context, ack}) => {
+        await ack();
+    });
 }
 
 
