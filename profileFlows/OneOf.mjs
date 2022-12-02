@@ -3,6 +3,7 @@ import {BaseProfile} from "./BaseProfile.mjs";
 
 export class OneOfProfile extends BaseProfile {
     constructor(app, profileConfig, index) {
+        profileConfig.title = 'Change Your Group';
         super(app, profileConfig, index)
         this.groups = this.groups || [];
         // Called when user selects a oneOf profile
@@ -39,68 +40,27 @@ export class OneOfProfile extends BaseProfile {
         }
     }
 
-    async selectProfile({body, context, ack, logger}) {
-        await ack();
-        try {
-            const tgUser = await this.app.lookupTgUserFromSlackUserId(body.user.id);
-            const userGroupNames = tgUser.groups.map(group => group.name);
 
-            // Make sure user is allowed to access profile
-            if (!userGroupNames.includes(this.applicableToGroup)) {
-                logger.error(new Error(`User '${tgUser.email}' has no access to profile '${this.profileName}'`));
-                return;
-            }
-
-            const view = await this.openModal(tgUser);
-            await this.app.client.views.open({
-                token: context.botToken,
-                trigger_id: body.trigger_id,
-                view: view
-            })
-        } catch (e) {
-            logger.error(e);
-        }
-    }
-
-    // Called when a user opens a profile - get configuration for profile and shot it in a modal
     async openModal(tgUser) {
-
-        const noGroupOption = {
+        let modal = await super.openModal(tgUser);
+        modal.blocks[0].accessory.options.unshift(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": "No Group",
+                },
+                value: JSON.stringify([-1])
+            }
+        );
+        modal.blocks[0].accessory.initial_option = {
             "text": {
                 "type": "plain_text",
                 "text": "No Group",
             },
             value: JSON.stringify([-1])
         };
-        let modal = {
-            type: 'modal',
-            callback_id: `submit_profile-${this.profileIndex}`,
-            title: {
-                type: 'plain_text',
-                // Not making Profile Name Part of the title as the title has a maximum of 25 chars restriction
-                text: `Change Your Group`
-            },
-            submit: {
-                type: 'plain_text',
-                text: 'Submit'
-            },
-            blocks: [
-                {
-                    type: "section",
-                    text: {
-                        type: "mrkdwn",
-                        text: `Which group would you like to switch to?`
-                    },
-                    accessory: {
-                        type: "static_select",
-                        action_id: "change_group",
-                        options: [noGroupOption],
-                        initial_option: noGroupOption
-                    }
-                }
-            ]
-        }
-        const userGroupNames = tgUser.groups.map(group => group.name)
+
+        const userGroupNames = tgUser.groups.map(group => group.name);
 
         for (const group of this.groups) {
             const requisiteGroup = this.profileConfig.groupPermissions[group];
@@ -118,8 +78,7 @@ export class OneOfProfile extends BaseProfile {
             modal.blocks[0]["accessory"]["options"].push(option)
         }
 
-
-        return modal;
+        return modal
     }
 
     // Called when user clicks to submit a profile change
