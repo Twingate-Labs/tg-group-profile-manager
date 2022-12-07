@@ -94,6 +94,11 @@ async function initApp(app) {
     app.action('request_access', async ({body, context, ack}) => {
         await ack();
     });
+
+    // dummy action watcher for requester rejected and approved buttons
+    app.action('dummy', async ({body, context, ack}) => {
+        await ack();
+    });
 }
 
 
