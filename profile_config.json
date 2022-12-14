@@ -28,6 +28,7 @@
         "Finance",
         "Sales"
       ],
+      "timeOptions": ["Forever", "1h", "8h", "24h", "7d", "30d", "90d"],
       "applicableToGroup": "Everyone",
       "approverGroup": "IT"
     }

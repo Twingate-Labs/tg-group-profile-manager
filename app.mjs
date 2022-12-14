@@ -1,4 +1,5 @@
 import boltPkg from '@slack/bolt';
+import boltSubtype from '@slack/bolt';
 import {createHome} from "./appHome.mjs";
 import {OneOfProfile} from "./profileFlows/OneOf.mjs";
 import dotenvPkg from 'dotenv';
@@ -7,6 +8,7 @@ import {SlackProfileManager} from "./SlackProfileManager.mjs";
 import {SelfServeApproval} from "./profileFlows/SelfServeApproval.mjs";
 
 const {App} = boltPkg;
+const {subtype} = boltSubtype
 dotenvPkg.config();
 
 async function loadProfiles(app) {
@@ -90,6 +92,11 @@ async function initApp(app) {
         await ack();
     });
 
+    // dummy action watcher for change time option
+    app.action('change_time_option', async ({body, context, ack}) => {
+        await ack();
+    });
+
     // dummy action watcher for group access request
     app.action('request_access', async ({body, context, ack}) => {
         await ack();
@@ -99,6 +106,17 @@ async function initApp(app) {
     app.action('dummy', async ({body, context, ack}) => {
         await ack();
     });
+
+    // app.message("", async ({event, body, context, ack}) => {
+    //     await ack()
+    //     console.log()
+    // });
+
+    // app.message(subtype("bot_message"), async ({event, body, context, ack}) => {
+    //     console.log()
+    // });
+
+
 }
 
 
@@ -120,7 +138,8 @@ async function initApp(app) {
 
     const app = new App({
         token: slackToken,
-        signingSecret: slackSigningSecret
+        signingSecret: slackSigningSecret,
+        ignoreSelf: false
     });
     await initApp(app);
     await app.start(process.env.PORT || port);
