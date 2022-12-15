@@ -11,6 +11,8 @@ if (process.env.DEPLOY_ENV !== "docker") {
     tgApiKey = await accessSecretVersion('tg-group-profile-manager-tg-api-key')
 }
 
+const GroupNameToIdMap = {};
+
 export class SlackProfileManager {
     constructor () {
         this.apiClient = new TwingateApiClient(tgAccount, tgApiKey, {
@@ -29,7 +31,26 @@ export class SlackProfileManager {
             let groupResults = await this.apiClient.fetchAllRootNodePages(groupQuery, {id: user.id, pageInfo: user.groups.pageInfo});
             for ( const group of groupResults ) user.groups.edges.push({node: group})
         }
+        user.groups = user.groups.edges.map(group => group.node);
+        // Just cache every group for now
+        for ( const group of user.groups ) GroupNameToIdMap[group.name] = group.id;
+        user.email = email;
         return user;
+    }
+
+    async lookUpGroupUsersByName(name){
+        const query = "query GroupUserByName($name:String!){groups(filter:{name:{eq:$name}}){edges{node{id name users{pageInfo{hasNextPage endCursor} edges{node{id email}}}}}}}";
+        let response = await this.apiClient.exec(query, {name: name});
+        let result = response.groups;
+        if ( result == null || result.edges == null || result.edges.length < 1 ) return null;
+        let group = result.edges[0].node;
+        if ( group.users.pageInfo.hasNextPage === true ) {
+            let userQuery = this.apiClient.getRootNodePagedQuery("GroupUsers", "group", "users", ["id", "email"])
+            let userResults = await this.apiClient.fetchAllRootNodePages(userQuery, {id: group.id, pageInfo: group.users.pageInfo});
+            for ( const user of userResults ) group.users.edges.push({node: user})
+        }
+        group.users = group.users.edges.map(group => group.node);
+        return group;
     }
 
 
@@ -38,11 +59,14 @@ export class SlackProfileManager {
     }
 
     async lookupGroupByName(name) {
+        if ( GroupNameToIdMap[name] ) return GroupNameToIdMap[name];
         const query = "query GroupByName($name:String){groups(filter:{name:{eq:$name}}){edges{node{id}}}}";
         let response = await this.apiClient.exec(query, {name: ""+name.trim()});
         let result = response.groups;
-        if ( result == null || result.edges == null || result.edges.length < 1 ) return null;
-        return result.edges[0].node.id;
+        if ( result.edges.length < 1 ) throw new Error(`Group not found in Twingate: '${name}'`);
+        const group = result.edges[0].node;
+        if ( group.id != null ) GroupNameToIdMap[group] = group.id;
+        return group.id;
     }
 
     async lookupUserByEmail(email) {

@@ -1,27 +1,39 @@
-  {
-    "profiles": [
-      {
-        "profileName": "Example Profile 1",
-        "profileType": "oneOf",
-        "groups": [
-          "Prod",
-          "Preprod",
-          "Testing"
-        ],
-        "applicableToGroup": "Everyone"
-      },
-      {
-        "profileName": "Example Profile 2",
-        "profileType": "oneOf",
-        "groups": [
-          "US",
-          "EU",
-          "ASIA"
-        ],
-        "applicableToGroup": "Everyone"
-      }
-    ],
-    "groupPermissions": {
-      "Prod": "Admin"
+{
+  "profiles": [
+    {
+      "profileName": "Example One Of Profile 1",
+      "profileType": "oneOf",
+      "groups": [
+        "Prod",
+        "Preprod",
+        "Testing"
+      ],
+      "applicableToGroup": "Everyone"
+    },
+    {
+      "profileName": "Example One Of Profile 2",
+      "profileType": "oneOf",
+      "groups": [
+        "US",
+        "EU",
+        "ASIA"
+      ],
+      "applicableToGroup": "Everyone"
+    },
+    {
+      "profileName": "Example Self-Serve Business Approvals",
+      "profileType": "selfServeApproval",
+      "groups": [
+        "HR",
+        "Finance",
+        "Sales"
+      ],
+      "timeOptions": ["Forever", "1h", "8h", "24h", "7d", "30d", "90d"],
+      "applicableToGroup": "Everyone",
+      "approverGroup": "IT"
     }
+  ],
+  "groupPermissions": {
+    "Prod": "Admin"
   }
+}

@@ -45,33 +45,11 @@ export const createHome = async(profileConfig, userEmail) => {
          return view
     }
 
-    const userGroups = userWithGroups.groups.edges.map(group => group.node)
-    const permittedProfiles = profileConfig.profiles.filter(profile => userGroups.map(group=>group.name).includes(profile.applicableToGroup))
+    const permittedProfiles = profileConfig.profiles.filter(profile => userWithGroups.groups.map(group=>group.name).includes(profile.applicableToGroup))
 
     for (const permittedProfile of permittedProfiles){
-        const currentActiveGroups = permittedProfile.groups.filter(group => userGroups.map(userGroup => userGroup.name).includes(group))
-        let currentActiveGroupsString = currentActiveGroups.join(", ")
-        if (!currentActiveGroupsString) {
-            currentActiveGroupsString = "None"
-        }
-        const block = {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": `*Profile: ${permittedProfile.profileName}*\nCurrent Group: ${currentActiveGroupsString}`
-            },
-            "accessory": {
-                "type": "button",
-                "action_id": "select_profile",
-                "text": {
-                    "type": "plain_text",
-                    "emoji": true,
-                    "text": "Change"
-                },
-                "value": `${permittedProfile.profileName}`
-            }
-        }
-        view.blocks.push({type: "divider"}, block)
+        const block = await permittedProfile.getAppHomeBlock(userWithGroups);
+        if ( block != null ) view.blocks.push({type: "divider"}, block);
     }
     return view
 };

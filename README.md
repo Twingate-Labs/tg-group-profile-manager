@@ -5,8 +5,10 @@ Typical use cases:
 * Manage access to resources that share the same IP addresses or DNS names
 * Segregate access to different environments (e.g. Development, Test, Production environments)
 * Switch between resources in different geographic regions
+* Request/approve access to groups
+* Time-bound access to groups (resources)
 
-Profiles can be configured in JSON and access to each profile can be restricted based on group membership. Currently the only profile type that is supported is a `one-of` pattern that ensures a user can only be in a single group from a set of possible groups.
+Profiles can be configured in JSON and access to each profile can be restricted based on group membership. 
 
 ![profile_list](./images/profile_list.png)
 ![change_group](./images/change_group.png)
@@ -55,5 +57,5 @@ For a manual deployment you may instead follow the [manual instructions](./docs/
 
 ### Current limitations & known issues
 1. When there are Twingate groups with duplicate names, only the first group returned by the Twingate API is used. To prevent this, ensure there are no duplicate group names in the Twingate network.
-3. The Slack users' email addresses needs to be the same as their Twingate email address.
-4. Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect but please advise end-users that this process can take ~20 seconds to pass through to connected clients.
+2. The Slack users' email addresses needs to be the same as their Twingate email address.
+3. Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect but please advise end-users that this process can take ~20 seconds to pass through to connected clients.
