@@ -5,8 +5,10 @@ Typical use cases:
 * Manage access to resources that share the same IP addresses or DNS names
 * Segregate access to different environments (e.g. Development, Test, Production environments)
 * Switch between resources in different geographic regions
+* Request/approve access to groups
+* Time-bound access to groups (resources)
 
-Profiles can be configured in JSON and access to each profile can be restricted based on group membership. Currently the only profile type that is supported is a `one-of` pattern that ensures a user can only be in a single group from a set of possible groups.
+Profiles can be configured in JSON and access to each profile can be restricted based on group membership. 
 
 ![profile_list](./images/profile_list.png)
 ![change_group](./images/change_group.png)

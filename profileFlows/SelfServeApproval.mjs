@@ -526,7 +526,10 @@ export class SelfServeApproval extends BaseProfile {
         const botInfo = await client.auth.test()
 
         // confirm the message was sent by the same bot user
-        if (event.bot_id !== botInfo.bot_id) return
+        if (event.bot_id !== botInfo.bot_id) {
+            console.warn(`Unexpected scheduled message received from user ${event.bot_id}`)
+            return
+        }
 
         const request = JSON.parse(event.text.replace("#Scheduled Message Trigger#", ""))
 
