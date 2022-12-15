@@ -222,7 +222,7 @@ export class SelfServeApproval extends BaseProfile {
 
 
             // sending self approved message to user
-            messageString = `The access request through profile _'${this.profileName}'_.\nGroup: ${selectedGroup}\nDuration: ${selectedTime}\n\`Self Approved\`\n_Note: Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect and this process can take ~20 seconds to pass through to connected clients._`
+            messageString = `The access request through profile _'${this.profileName}'_.\nGroup: ${selectedGroup}\n\`Your access will expire in ${selectedTime}\`\n\`Self Approved\`\n_Note: Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect and this process can take ~20 seconds to pass through to connected clients._`
             msgOption = {
                 channel: slackUserId,
                 text: messageString,
@@ -304,7 +304,7 @@ export class SelfServeApproval extends BaseProfile {
                                 },
                                 "confirm": {
                                     "type": "plain_text",
-                                    "text": "Do it"
+                                    "text": "Confirm"
                                 },
                                 "deny": {
                                     "type": "plain_text",
@@ -333,7 +333,7 @@ export class SelfServeApproval extends BaseProfile {
                                 },
                                 "confirm": {
                                     "type": "plain_text",
-                                    "text": "Do it"
+                                    "text": "Confirm"
                                 },
                                 "deny": {
                                     "type": "plain_text",
@@ -507,13 +507,13 @@ export class SelfServeApproval extends BaseProfile {
             // sending group change message to requester
             msgOption = {
                 channel: request.requesterSlackId,
-                text: `Access request through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}\n\`Approved By\` <@${body.user.id}> \n _Note: Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect and this process can take ~20 seconds to pass through to connected clients._`,
+                text: `Access request through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\n\`Your access will expire in ${request.selectedTime}\`\n\`Approved By\` <@${body.user.id}> \n _Note: Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect and this process can take ~20 seconds to pass through to connected clients._`,
                 blocks: [
                     {
                         type: 'section',
                         text: {
                             type: 'mrkdwn',
-                            text: `Access request through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}\n\`Approved By\` <@${body.user.id}> \n _Note: Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect and this process can take ~20 seconds to pass through to connected clients._`
+                            text: `Access request through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\n\`Your access will expire in ${request.selectedTime}\`\n\`Approved By\` <@${body.user.id}> \n _Note: Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect and this process can take ~20 seconds to pass through to connected clients._`
                         }
                     }
                 ]
