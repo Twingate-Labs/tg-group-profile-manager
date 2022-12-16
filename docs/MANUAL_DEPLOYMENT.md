@@ -16,12 +16,10 @@ export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)
 7. Copy the URL of the Slack app, e.g. `https://tg-group-profile-manager-xxxxx-nw.a.run.app`
 
 ### Deploy on Docker
-1. Clone the latest tg group profile manager `git clone https://github.com/Twingate-Labs/tg-group-profile-manager.git`
-2. `cd tg-group-profile-manager`
-3. Update `tg-group-profile-manager.conf` with the configuration values described in the [README](../README.md)
-4. Build Docker container `docker build . -t tg-group-profile-manager`
-5. Run Docker container `docker run -p 8080:8080 --env-file ./tg-group-profile-manager.conf -d --name tg-group-profile-manager tg-group-profile-manager`
-6. Now you should have the `tg-group-profile_manager` running on port 8080
+1. Download `tg-group-profile-manager.conf` template [here](../tg-group-profile-manager.conf)
+2. Update `tg-group-profile-manager.conf` with the configuration values described in the [README](../README.md)
+4. Download and run Docker container `docker run -p 8080:8080 --env-file ./.env -d --name tg-group-profile-manager ghcr.io/twingate-labs/tg-group-profile-manager:latest`
+5. Now you should have the `tg-group-profile_manager` container running on port 8080
 
 
 ### Deploy on NodeJS
