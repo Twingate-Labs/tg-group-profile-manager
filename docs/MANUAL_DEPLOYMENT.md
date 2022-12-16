@@ -18,7 +18,7 @@ export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)
 ### Deploy on Docker
 1. Download `tg-group-profile-manager.conf` template [here](../tg-group-profile-manager.conf)
 2. Update `tg-group-profile-manager.conf` with the configuration values described in the [README](../README.md)
-4. Download and run Docker container `docker run -p 8080:8080 --env-file ./.env -d --name tg-group-profile-manager ghcr.io/twingate-labs/tg-group-profile-manager:latest`
+4. Download and run Docker container `docker run -p 8080:8080 --env-file ./tg-group-profile-manager.conf -d --name tg-group-profile-manager ghcr.io/twingate-labs/tg-group-profile-manager:latest`
 5. Now you should have the `tg-group-profile_manager` container running on port 8080
 
 
