@@ -9,7 +9,7 @@ export class SelfServeApproval extends BaseProfile {
             "Forever" : "Forever",
             "1h": "1 Hour",
             "8h": "8 Hours",
-            "1d": "1 Day",
+            "24": "24 Hours",
             "7d": "7 Days",
             "30d": "30 Days",
             "90d": "90 Days"
