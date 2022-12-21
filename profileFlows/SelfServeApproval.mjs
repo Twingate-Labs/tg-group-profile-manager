@@ -179,7 +179,7 @@ export class SelfServeApproval extends BaseProfile {
 
     }
 
-    // Apply oneOf profile change
+    // Apply selfServe profile change
     async submitRequest(body, client, selectedGroup, selectedTime,reasonForRequest, tgUser, slackUserId) {
         const profileManager = new SlackProfileManager(),
             userGroupNames = tgUser.groups.map(userGroup => userGroup.name),
@@ -205,12 +205,12 @@ export class SelfServeApproval extends BaseProfile {
                 }
 
                 const botInfo = await client.auth.test()
-                await client.chat.scheduleMessage({
-                // await client.chat.postMessage({
+                // await client.chat.scheduleMessage({
+                await client.chat.postMessage({
                     channel: botInfo.user_id,
                     // channel: "C045BRH55HA",
                     text: `#Scheduled Message Trigger#${JSON.stringify(request)}`,
-                    post_at: expiry // no timestamp data from data as no message was posted yet
+                    post_at: expiry
                 })
                 console.log(`<@${request.requesterSlackId}> requesting access through profile _'${this.profileName}'_. Group: ${request.requestedGroupName} Duration: ${request.selectedTime} will be expired at '${expiry}'`)
             }
@@ -466,8 +466,8 @@ export class SelfServeApproval extends BaseProfile {
             if (request.selectedTime !== "Forever") {
                 request.approverSlackId = body.user.id
                 expiry = this.durationParser(Math.round(body.message.ts), request.selectedTime)
-                await client.chat.scheduleMessage({
-                // await client.chat.postMessage({
+                // await client.chat.scheduleMessage({
+                await client.chat.postMessage({
                     channel: botInfo.user_id,
                     // channel: "C045BRH55HA",
                     text: `#Scheduled Message Trigger#${JSON.stringify(request)}`,
