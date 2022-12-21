@@ -193,6 +193,7 @@ export class SelfServeApproval extends BaseProfile {
                 const expiry = this.durationParser(Math.round(Date.now()/1000), selectedTime)
 
                 const request = {
+                    requestedProfile: this.profileName,
                     approverSlackId: slackUserId,
                     requesterTwingateId: tgUser.id,
                     requesterEmail: tgUser.email,
@@ -465,6 +466,7 @@ export class SelfServeApproval extends BaseProfile {
             let expiry = "Forever"
             if (request.selectedTime !== "Forever") {
                 request.approverSlackId = body.user.id
+                request.requestedProfile = this.profileName
                 expiry = this.durationParser(Math.round(body.message.ts), request.selectedTime)
                 await client.chat.scheduleMessage({
                 // await client.chat.postMessage({
@@ -526,6 +528,11 @@ export class SelfServeApproval extends BaseProfile {
     }
 
     async scheduledMessageTrigger({event, client, body, context, ack, logger}) {
+        const request = JSON.parse(event.text.replace("#Scheduled Message Trigger#", ""))
+
+        // skip if not the profile
+        if (request.requestedProfile !== this.profileName) return
+
         const botInfo = await client.auth.test()
 
         // confirm the message was sent by the same bot user
@@ -533,8 +540,6 @@ export class SelfServeApproval extends BaseProfile {
             console.warn(`Unexpected scheduled message received from user ${event.bot_id}`)
             return
         }
-
-        const request = JSON.parse(event.text.replace("#Scheduled Message Trigger#", ""))
 
         // remove user from group through twingate API
         const profileManager = new SlackProfileManager()
