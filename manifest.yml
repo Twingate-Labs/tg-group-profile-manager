@@ -21,6 +21,7 @@ settings:
     request_url: https://tg-group-profile-manager-xxxxx-nw.a.run.app/slack/events
     bot_events:
       - app_home_opened
+      - message.im
   interactivity:
     is_enabled: true
     request_url: https://tg-group-profile-manager-xxxxx-nw.a.run.app/slack/events
