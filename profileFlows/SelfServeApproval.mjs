@@ -205,8 +205,8 @@ export class SelfServeApproval extends BaseProfile {
                 }
 
                 const botInfo = await client.auth.test()
-                // await client.chat.scheduleMessage({
-                await client.chat.postMessage({
+                await client.chat.scheduleMessage({
+                // await client.chat.postMessage({
                     channel: botInfo.user_id,
                     // channel: "C045BRH55HA",
                     text: `#Scheduled Message Trigger#${JSON.stringify(request)}`,
@@ -466,8 +466,8 @@ export class SelfServeApproval extends BaseProfile {
             if (request.selectedTime !== "Forever") {
                 request.approverSlackId = body.user.id
                 expiry = this.durationParser(Math.round(body.message.ts), request.selectedTime)
-                // await client.chat.scheduleMessage({
-                await client.chat.postMessage({
+                await client.chat.scheduleMessage({
+                // await client.chat.postMessage({
                     channel: botInfo.user_id,
                     // channel: "C045BRH55HA",
                     text: `#Scheduled Message Trigger#${JSON.stringify(request)}`,
