@@ -1,9 +1,14 @@
 import {BaseProfile} from "./BaseProfile.mjs";
 import {SlackProfileManager} from "../SlackProfileManager.mjs";
+import { v4 as uuidv4 } from 'uuid';
 
 
 
 export class SelfServeApproval extends BaseProfile {
+    static REVOKE_ACCESS_MESSAGE =  "#Duration Access Revoked#";
+    static GRANT_ACCESS_MESSAGE =  "#Duration Access Granted#";
+    static MESSAGE_TRIGGER = "#Scheduled Message Trigger#"
+
     constructor(app, profileConfig, index) {
         const timeOptions = {
             "Forever" : "Forever",
@@ -193,6 +198,7 @@ export class SelfServeApproval extends BaseProfile {
                 const expiry = this.durationParser(Math.round(Date.now()/1000), selectedTime)
 
                 const request = {
+                    requestId: uuidv4(),
                     requestedProfile: this.profileName,
                     approverSlackId: slackUserId,
                     requesterTwingateId: tgUser.id,
@@ -206,11 +212,16 @@ export class SelfServeApproval extends BaseProfile {
                 }
 
                 const botInfo = await client.auth.test()
-                // await client.chat.scheduleMessage({
                 await client.chat.postMessage({
                     channel: botInfo.user_id,
                     // channel: "C045BRH55HA",
-                    text: `#Scheduled Message Trigger#${JSON.stringify(request)}`,
+                    text: `${SelfServeApproval.GRANT_ACCESS_MESSAGE}${JSON.stringify(request)}`,
+                })
+                await client.chat.scheduleMessage({
+                // await client.chat.postMessage({
+                    channel: botInfo.user_id,
+                    // channel: "C045BRH55HA",
+                    text: `${SelfServeApproval.MESSAGE_TRIGGER}${JSON.stringify(request)}`,
                     post_at: expiry
                 })
                 console.log(`<@${request.requesterSlackId}> requesting access through profile _'${this.profileName}'_. Group: ${request.requestedGroupName} Duration: ${request.selectedTime} will be expired at '${expiry}'`)
@@ -249,6 +260,8 @@ export class SelfServeApproval extends BaseProfile {
             const approverSlackInfo = await client.users.lookupByEmail({email: approver.email})
 
             const request = {
+                requestId: uuidv4(),
+                requestedProfile: this.profileName,
                 approverEmail: approver.email,
                 requesterTwingateId: tgUser.id,
                 requesterEmail: tgUser.email,
@@ -466,13 +479,16 @@ export class SelfServeApproval extends BaseProfile {
             let expiry = "Forever"
             if (request.selectedTime !== "Forever") {
                 request.approverSlackId = body.user.id
-                request.requestedProfile = this.profileName
                 expiry = this.durationParser(Math.round(body.message.ts), request.selectedTime)
-                // await client.chat.scheduleMessage({
                 await client.chat.postMessage({
                     channel: botInfo.user_id,
+                    text: `${SelfServeApproval.GRANT_ACCESS_MESSAGE}${JSON.stringify(request)}`,
+                })
+                await client.chat.scheduleMessage({
+                // await client.chat.postMessage({
+                    channel: botInfo.user_id,
                     // channel: "C045BRH55HA",
-                    text: `#Scheduled Message Trigger#${JSON.stringify(request)}`,
+                    text: `${SelfServeApproval.MESSAGE_TRIGGER}${JSON.stringify(request)}`,
                     post_at: expiry
                 })
                 console.log(`<@${request.requesterSlackId}> requesting access through profile _'${this.profileName}'_. Group: ${request.requestedGroupName} Duration: ${request.selectedTime} will be expired at '${expiry}'`)
@@ -528,7 +544,7 @@ export class SelfServeApproval extends BaseProfile {
     }
 
     async scheduledMessageTrigger({event, client, body, context, ack, logger}) {
-        const request = JSON.parse(event.text.replace("#Scheduled Message Trigger#", ""))
+        const request = JSON.parse(event.text.replace(SelfServeApproval.MESSAGE_TRIGGER, ""))
 
         // skip if not the profile
         if (request.requestedProfile !== this.profileName) return
@@ -544,6 +560,12 @@ export class SelfServeApproval extends BaseProfile {
         // remove user from group through twingate API
         const profileManager = new SlackProfileManager()
         await profileManager.removeUserFromGroup(request.requestedGroupId, request.requesterTwingateId)
+
+        // post duration access revoked message to self
+        await client.chat.postMessage({
+            channel: botInfo.user_id,
+            text: `${SelfServeApproval.REVOKE_ACCESS_MESSAGE}${JSON.stringify(request)}`,
+        })
 
         // approver message
         let messageString = `<@${request.requesterSlackId}> profile _'${this.profileName}'_ access expired.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}\nReason For Request: ${request.reasonForRequest}.\nApproved By <@${request.approverSlackId}>\n\`Access Expired\``
@@ -581,7 +603,7 @@ export class SelfServeApproval extends BaseProfile {
         }
         await client.chat.postMessage(msgOption)
 
-        console.log(`Profile _'${this.profileName}'_ access expired. Group: ${request.requestedGroupName} Duration: ${request.selectedTime}`)
+        console.log(`User ${request.requesterEmail} profile _'${this.profileName}'_ access expired. Group: ${request.requestedGroupName} Duration: ${request.selectedTime}`)
 
     }
 
@@ -597,5 +619,7 @@ export class SelfServeApproval extends BaseProfile {
                 throw `time option '${selectedTime}' format not supported`
         }
     }
+
+
 
 }
