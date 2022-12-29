@@ -167,12 +167,12 @@ async function initApp(app) {
     });
     await initApp(app);
 
-    console.log(`Checking all expired duration based accesses are revoked.`)
-    await startUpCleanUp(app)
-    console.log(`All expired duration based accesses are revoked.`)
-
     await app.start(process.env.PORT || port);
     console.log(`⚡️ Slack Bolt app is running on port ${port}!`);
 
+    // todo: confirm the block below is not preventing the bot to accept event in Cloudrun without no cpu throttling
+    console.log(`Checking all expired duration based accesses are revoked.`)
+    await startUpCleanUp(app)
+    console.log(`All expired duration based accesses are revoked.`)
 
 })();
