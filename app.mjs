@@ -52,6 +52,30 @@ async function loadProfiles(app) {
     return profileConfig;
 }
 
+async function startUpCleanUp (app) {
+    const botInfo = await app.client.auth.test()
+    const selfMessage = await app.client.chat.postMessage({channel: botInfo.user_id, text: "Service Started!"})
+    const conversations = await app.client.conversations.history({channel: selfMessage.channel, oldest: Number(selfMessage.ts)-(60*60*24*3)})
+    const grantMessages =  conversations.messages.filter(message => message.text.startsWith(SelfServeApproval.GRANT_ACCESS_MESSAGE)).map(message => JSON.parse(message.text.replace(SelfServeApproval.GRANT_ACCESS_MESSAGE, ""))) || []
+    const revokeMessages = conversations.messages.filter(message => message.text.startsWith(SelfServeApproval.REVOKE_ACCESS_MESSAGE)).map(message => JSON.parse(message.text.replace(SelfServeApproval.REVOKE_ACCESS_MESSAGE, ""))) || []
+    const revokeMessageIds = revokeMessages.map(revokeMessage => revokeMessage.requestId)
+    const missingRevokeMessages = grantMessages.filter(grantMessage => !revokeMessageIds.includes(grantMessage.requestId))
+
+    const profileManager = new SlackProfileManager()
+    const timeNow = Date.now()/1000
+    for (const missingRevokeMessage of missingRevokeMessages) {
+        if (missingRevokeMessage.expiry < timeNow) {
+            await profileManager.removeUserFromGroup(missingRevokeMessage.requestedGroupId, missingRevokeMessage.requesterTwingateId)
+            // post duration access revoked message to self
+            await app.client.chat.postMessage({
+                channel: botInfo.user_id,
+                text: `${SelfServeApproval.REVOKE_ACCESS_MESSAGE}${JSON.stringify(missingRevokeMessage)}`,
+            })
+            console.log(`User ${missingRevokeMessage.requesterEmail} profile _'${missingRevokeMessage.requestedProfile}'_ access expired but not yet revoked, revoking now. Group: ${missingRevokeMessage.requestedGroupName} Duration: ${missingRevokeMessage.selectedTime}`)
+        }
+    }
+}
+
 async function initApp(app) {
     const profileConfig = await loadProfiles(app);
 
@@ -142,6 +166,13 @@ async function initApp(app) {
         ignoreSelf: false
     });
     await initApp(app);
+
     await app.start(process.env.PORT || port);
     console.log(`⚡️ Slack Bolt app is running on port ${port}!`);
+
+    // todo: confirm the block below is not preventing the bot to accept event in Cloudrun without no cpu throttling
+    console.log(`Checking all expired duration based accesses are revoked.`)
+    await startUpCleanUp(app)
+    console.log(`All expired duration based accesses are revoked.`)
+
 })();
