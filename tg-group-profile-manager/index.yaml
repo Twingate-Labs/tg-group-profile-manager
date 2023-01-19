@@ -9,6 +9,6 @@ entries:
     name: tg-group-profile-manager
     type: application
     urls:
-    - tg-group-profile-manager-0.1.0.tgz
+    - https://github.com/Twingate-Labs/tg-group-profile-manager/raw/helm/tg-group-profile-manager/tg-group-profile-manager-0.1.0.tgz
     version: 0.1.0
 generated: "2023-01-19T14:57:06.770497Z"
