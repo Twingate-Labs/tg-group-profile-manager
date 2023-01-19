@@ -1,0 +1,27 @@
+image:
+  repository: ghcr.io/twingate-labs/tg-group-profile-manager
+  pullPolicy: Always
+  tag: v0.0.4
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+service:
+  type: LoadBalancer
+  port: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+variables:
+  twingateAccount:
+  twingateApiKey:
+  slackSigningSecret:
+  slackBotToken:
+  profileConifg:
+  deployEnv: "docker"

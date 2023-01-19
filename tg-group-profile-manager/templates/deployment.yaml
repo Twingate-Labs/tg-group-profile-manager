@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tg-group-profile-manager.fullname" . }}
+  labels:
+    {{- include "tg-group-profile-manager.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "tg-group-profile-manager.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "tg-group-profile-manager.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            - name: TG_ACCOUNT
+              value: {{ .Values.variables.twingateAccount }}
+            - name: TG_API_KEY
+              value: {{ .Values.variables.twingateApiKey }}
+            - name: SLACK_SIGNING_SECRET
+              value: {{ .Values.variables.slackSigningSecret }}
+            - name: SLACK_BOT_TOKEN
+              value: {{ .Values.variables.slackBotToken }}
+            - name: PROFILE_CONFIG
+              value: {{ .Values.variables.profileConifg | toJson | quote }}
+            - name: DEPLOY_ENV
+              value: {{ .Values.variables.deployEnv }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
