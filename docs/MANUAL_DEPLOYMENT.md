@@ -22,7 +22,16 @@ export SERVICE_ACCOUNT=$(gcloud iam service-accounts list --format 'value(EMAIL)
 5. Now you should have the `tg-group-profile_manager` container running on port 8080
 
 ## Deploy on K8S
-1. 
+To install the chart
+```shell
+$ helm repo add twingate-labs https://twingate-labs.github.io/tg-group-profile-manager-helm/
+$ helm install tg-group-profile-manager twingate-labs/tg-group-profile-manager -n [namespace] \
+    --set variables.twingateAccount="xxx.twingate.com" \
+    --set variables.twingateApiKey="xxx" \
+    --set variables.slackSigningSecret="xxx" \
+    --set variables.slackBotToken="xoxb-xxx" \
+    --set-json='variables.profileConifg={"profiles":[{"profileName":"Example One Of Profile 1","profileType":"oneOf","groups":["Prod","Preprod","Testing"],"applicableToGroup":"Everyone"},{"profileName":"Example One Of Profile 2","profileType":"oneOf","groups":["US","EU","ASIA"],"applicableToGroup":"Everyone"},{"profileName":"Example Self-Serve Business Approvals","profileType":"selfServeApproval","groups":["HR","Finance","Sales"],"timeOptions": ["Forever", "1h", "8h", "24h", "7d", "30d", "90d"],"applicableToGroup":"Everyone","approverGroup":"IT"}, {"profileName":"Example Self-Serve Business Approvals 2","profileType":"selfServeApproval","groups":["HR","Finance","Sales"],"timeOptions": ["Forever", "1h", "8h", "24h"],"applicableToGroup":"Everyone","approverGroup":"IT"}],"groupPermissions":{"Prod":"Admin"}}'
+```
 
 ### Deploy on NodeJS
 _NodeJS 18+ required_
