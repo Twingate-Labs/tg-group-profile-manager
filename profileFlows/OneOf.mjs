@@ -30,6 +30,7 @@ export class OneOfProfile extends BaseProfile {
             "accessory": {
                 "type": "button",
                 "action_id": `select_profile-${this.profileIndex}`,
+                "style": "primary",
                 "text": {
                     "type": "plain_text",
                     "emoji": true,

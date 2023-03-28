@@ -45,11 +45,8 @@ export class SelfServeApproval extends BaseProfile {
         const userGroupNames = tgUser.groups.map(group => group.name);
         const groupOptions = this.groups.filter(group => !userGroupNames.includes(group))
         let currentActiveGroupsString = groupOptions.join(", ")
-        if (!currentActiveGroupsString) {
-            currentActiveGroupsString = "None"
-        }
 
-        return {
+        const block = {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
@@ -58,6 +55,7 @@ export class SelfServeApproval extends BaseProfile {
             "accessory": {
                 "type": "button",
                 "action_id": `select_profile-${this.profileIndex}`,
+                "style": "primary",
                 "text": {
                     "type": "plain_text",
                     "emoji": true,
@@ -66,6 +64,14 @@ export class SelfServeApproval extends BaseProfile {
                 "value": `${this.profileName}`
             }
         }
+
+        if (!currentActiveGroupsString) {
+            block.text.text = `*Profile: ${this.profileName}* (Request Access)\nOptions: None`;
+            block.accessory.action_id = "has_all_access";
+            delete block.accessory.style;
+        }
+
+        return block
     }
 
 

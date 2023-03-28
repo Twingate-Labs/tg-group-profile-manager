@@ -131,6 +131,12 @@ async function initApp(app) {
         await ack();
     });
 
+    // dummy action watcher for requester has access to all the groups
+    app.action('has_all_access', async ({body, context, ack}) => {
+        await ack();
+    });
+
+
     // app.message("", async ({event, body, context, ack}) => {
     //     await ack()
     //     console.log()
