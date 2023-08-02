@@ -46,9 +46,12 @@ async function loadProfiles(app) {
         switch (profile.profileType) {
             case "oneOf": return new OneOfProfile(app, profileConfig, index);
             case "selfServeApproval": return new SelfServeApproval(app, profileConfig, index);
-            default: return profile;
+            default:
+                console.error(`Unknown profile type: ${JSON.stringify(profile)}` );
+                return null;
         }
     });
+    profileConfig.profiles = profileConfig.profiles.filter(p => p !== null);
     return profileConfig;
 }
 
