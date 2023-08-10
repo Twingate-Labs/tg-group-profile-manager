@@ -16,6 +16,7 @@ oauth_config:
       - chat:write
       - users:read
       - users:read.email
+      - im:history
 settings:
   event_subscriptions:
     request_url: https://tg-group-profile-manager-xxxxx-nw.a.run.app/slack/events
