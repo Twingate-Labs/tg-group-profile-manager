@@ -24,13 +24,9 @@ data:
   DEPLOY_ENV: ZG9ja2Vy
 ```
 
-Deploy Secret and Helm
+## Deploy Secret and Helm
 ```
 kubectl apply -f secret.yaml
-```
-
-Deploy the tg-group-profile-manager helm
-```
 helm repo add twingate-labs https://twingate-labs.github.io/tg-group-profile-manager-helm/
 helm install tg-group-profile-manager twingate-labs/tg-group-profile-manager -n [namespace] \
     --set externalSecret.name=tg-group-profile-manager
