@@ -4,7 +4,7 @@ import dotenvPkg from 'dotenv';
 dotenvPkg.config();
 
 //todo: centralise all accessSecretVersion
-const applicationName = "tg-group-profile-manager"
+const applicationName = "Twingate-tg-group-profile-manager/0.0.1"
 let [tgAccount,tgApiKey] = [process.env.TG_ACCOUNT, process.env.TG_API_KEY]
 if (process.env.DEPLOY_ENV !== "docker") {
     tgAccount = await accessSecretVersion('tg-group-profile-manager-tg-account')
