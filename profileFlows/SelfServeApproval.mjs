@@ -13,10 +13,22 @@ export class SelfServeApproval extends BaseProfile {
         const timeOptions = {
             "Forever" : "Forever",
             "1h": "1 Hour",
+            "2h": "2 Hours",
+            "4h": "4 Hours",
+            "6h": "6 Hours",
             "8h": "8 Hours",
+            "12h": "12 Hours",
             "24h": "24 Hours",
+            "2d": "2 Days",
+            "3d": "3 Days",
+            "4d": "4 Days",
+            "5d": "5 Days",
+            "6d": "6 Days",
             "7d": "7 Days",
+            "14d": "14 Days",
+            "21d": "21 Days",
             "30d": "30 Days",
+            "60d": "60 Days",
             "90d": "90 Days"
         }
         profileConfig.title = 'Request Access';
@@ -191,7 +203,7 @@ export class SelfServeApproval extends BaseProfile {
     }
 
     // Apply selfServe profile change
-    async submitRequest(body, client, selectedGroup, selectedTime,reasonForRequest, tgUser, slackUserId) {
+    async submitRequest(body, client, selectedGroup, selectedTime, reasonForRequest, tgUser, slackUserId) {
         const profileManager = new SlackProfileManager(),
             userGroupNames = tgUser.groups.map(userGroup => userGroup.name),
             groupId = await profileManager.lookupGroupByName(selectedGroup);
@@ -199,23 +211,25 @@ export class SelfServeApproval extends BaseProfile {
         // the user is part of the approver group
         if (userGroupNames.includes(this.approverGroup)){
             let msgOption = ""
+            const request = {
+                requestId: uuidv4(),
+                requestedProfile: this.profileName,
+                requestedProfileType: this.profileType,
+                requesterTwingateId: tgUser.id,
+                requesterEmail: tgUser.email,
+                requesterSlackId: slackUserId,
+                requestedGroupName: selectedGroup,
+                requestedGroupId: groupId,
+                reasonForRequest: reasonForRequest,
+                approverSlackId: slackUserId,
+                selectedTime: selectedTime,
+                selfApproval: true
+            }
             if (selectedTime !== "Forever") {
-                // todo: adding expire time
                 const expiry = this.durationParser(Math.round(Date.now()/1000), selectedTime)
-
-                const request = {
-                    requestId: uuidv4(),
-                    requestedProfile: this.profileName,
-                    approverSlackId: slackUserId,
-                    requesterTwingateId: tgUser.id,
-                    requesterEmail: tgUser.email,
-                    requesterSlackId: slackUserId,
-                    requestedGroupName: selectedGroup,
-                    requestedGroupId: groupId,
-                    reasonForRequest: reasonForRequest,
-                    selectedTime: selectedTime,
-                    expiry: expiry
-                }
+                // todo: test, to be removed
+                // const expiry = Math.round(Date.now()/1000)+10
+                request.expiry = expiry;
 
                 const botInfo = await client.auth.test()
                 await client.chat.postMessage({
@@ -230,11 +244,16 @@ export class SelfServeApproval extends BaseProfile {
                     text: `${SelfServeApproval.MESSAGE_TRIGGER}${JSON.stringify(request)}`,
                     post_at: expiry
                 })
-                console.log(`<@${request.requesterSlackId}> requesting access through profile _'${this.profileName}'_. Group: ${request.requestedGroupName} Duration: ${request.selectedTime} will be expired at '${expiry}'`)
+                // console.log(`<@${request.requesterSlackId}> requesting access through profile _'${this.profileName}'_. Group: ${request.requestedGroupName} Duration: ${request.selectedTime} will be expired at '${expiry}'`)
             }
 
             await profileManager.addUserToGroup(groupId, tgUser.id)
-            console.log(`User '${tgUser.email}' in profile '${this.profileName}' is part of the approver group '${this.approverGroup}', access request through profile ${this.profileName} to group '${selectedGroup}' with duration '${selectedTime}' approved.`);
+            // console.log(`User '${tgUser.email}' in profile '${this.profileName}' is part of the approver group '${this.approverGroup}', access request through profile ${this.profileName} to group '${selectedGroup}' with duration '${selectedTime}' approved.`);
+
+
+            const requestObj = (({ requestId, ...o }) => o)(request)
+            requestObj.status = "Access Granted"
+            console.log(JSON.stringify(requestObj))
 
 
             // sending self approved message to user
@@ -268,7 +287,9 @@ export class SelfServeApproval extends BaseProfile {
             const request = {
                 requestId: uuidv4(),
                 requestedProfile: this.profileName,
+                requestedProfileType: this.profileType,
                 approverEmail: approver.email,
+                approverGroup: this.approverGroup,
                 requesterTwingateId: tgUser.id,
                 requesterEmail: tgUser.email,
                 requesterSlackId: slackUserId,
@@ -276,11 +297,12 @@ export class SelfServeApproval extends BaseProfile {
                 requestedGroupId: groupId,
                 reasonForRequest: reasonForRequest,
                 selectedTime: selectedTime,
+                selfApproval: false
             }
 
 
             // approver slack message
-            let messageString = `<@${slackUserId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${selectedGroup}\nDuration: ${selectedTime}\nReason For Request: ${reasonForRequest}.`
+            let messageString = `<@${slackUserId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${selectedGroup}\nDuration: ${selectedTime}\nReason For Request: ${reasonForRequest}`
             msgOption = {
                 channel: approverSlackInfo.user.id,
                 text: messageString,
@@ -319,7 +341,7 @@ export class SelfServeApproval extends BaseProfile {
                                 },
                                 "text": {
                                     "type": "mrkdwn",
-                                    "text": `Are you sure you want to APPROVE the request to add user <@${slackUserId}> to the Twingate group '${selectedGroup}' for _'${selectedTime}'?`
+                                    "text": `Are you sure you want to APPROVE the request to add user <@${slackUserId}> to the Twingate group '${selectedGroup}' for '${selectedTime}'?`
                                 },
                                 "confirm": {
                                     "type": "plain_text",
@@ -348,7 +370,7 @@ export class SelfServeApproval extends BaseProfile {
                                 },
                                 "text": {
                                     "type": "mrkdwn",
-                                    "text": `Are you sure you want to REJECT the request to add user <@${slackUserId}> to the Twingate group '${selectedGroup}' for _'${selectedTime}'?`
+                                    "text": `Are you sure you want to REJECT the request to add user <@${slackUserId}> to the Twingate group '${selectedGroup}' for '${selectedTime}'?`
                                 },
                                 "confirm": {
                                     "type": "plain_text",
@@ -384,11 +406,11 @@ export class SelfServeApproval extends BaseProfile {
             // message.blocks[1].elements.forEach(element => element.value.approverMessages = [["D0487E9ASPQ","1670342935.338389"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D0487E9ASPQ","1670342935.338389"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"],["D048E2M1ZQA","1670342935.681669"]])
             message.blocks[1].elements.forEach(element => element.value = JSON.stringify(element.value))
             await client.chat.update(message)
-            console.log(`User '${tgUser.email}' in profile '${this.profileName}', access request to group '${selectedGroup}' with duration _'${selectedTime}'_ is sent to group member ${approverEmail} from approver group '${this.approverGroup}'.`);
+            // console.log(`User '${tgUser.email}' in profile '${this.profileName}', access request to group '${selectedGroup}' with duration _'${selectedTime}'_ is sent to group member ${approverEmail} from approver group '${this.approverGroup}'.`);
         }
 
         // requester slack message
-        let messageString = `Group access request through profile _'${this.profileName}' has been sent.\nGroup: ${selectedGroup}\nDuration: ${selectedTime}\nA new Slack message will be sent to you once the request is approved/rejected.`
+        let messageString = `Group access request through profile _'${this.profileName}'_ has been sent.\nGroup: ${selectedGroup}\nDuration: ${selectedTime}\nA new Slack message will be sent to you once the request is approved/rejected.`
         msgOption = {
             channel: slackUserId,
             text: messageString,
@@ -403,6 +425,22 @@ export class SelfServeApproval extends BaseProfile {
             ]
         }
         await client.chat.postMessage(msgOption)
+        const request = {
+            requestedProfile: this.profileName,
+            requestedProfileType: this.profileType,
+            requesterTwingateId: tgUser.id,
+            requesterEmail: tgUser.email,
+            requesterSlackId: slackUserId,
+            requestedGroupName: selectedGroup,
+            requestedGroupId: groupId,
+            approverGroup: approverGroup.name,
+            approverGroupMembers: approverGroup.users.map(user=>user.email),
+            reasonForRequest: reasonForRequest,
+            selectedTime: selectedTime,
+            selfApproval: false,
+            status: "Access Pending Approval"
+        }
+        console.log(JSON.stringify(request))
     };
 
 
@@ -439,7 +477,7 @@ export class SelfServeApproval extends BaseProfile {
             // sending all approvers the rejected message
             for (const approver of approvers) {
                 try {
-                    let messageString = `<@${request.requesterSlackId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}\nReason For Request: ${reasonForRequest}.\n\`Rejected By\` <@${body.user.id}>`
+                    let messageString = `<@${request.requesterSlackId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}\nReason For Request: ${reasonForRequest} \n\`Rejected By\` <@${body.user.id}>`
                     msgOption = {
                         channel: approver[0],
                         ts: approver[1],
@@ -456,10 +494,14 @@ export class SelfServeApproval extends BaseProfile {
                     }
                     await client.chat.update(msgOption)
                 } catch(e) {
-                    console.log(e)
+                    logger.error(e)
                 }
             }
-            logger.info(`User '${request.requesterEmail}' request to group _'${request.requestedGroupName}'_ with duration _'${request.selectedTime}'_through profile _'${this.profileName}'_ has been rejected by ${body.user.id}.`)
+
+            const requestObj = (({ approverMessages, requestId, ...o }) => o)(request)
+            // logger.info(`User '${request.requesterEmail}' request to group _'${request.requestedGroupName}'_ with duration _'${request.selectedTime}'_through profile _'${this.profileName}'_ has been rejected by ${body.user.id}.`)
+            requestObj.status = "Request Rejected"
+            console.log(JSON.stringify(requestObj))
 
             // sending rejected message to requester
             let messageString = `Access request through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}\n\`Rejected By\` <@${body.user.id}>`
@@ -486,6 +528,7 @@ export class SelfServeApproval extends BaseProfile {
             if (request.selectedTime !== "Forever") {
                 request.approverSlackId = body.user.id
                 expiry = this.durationParser(Math.round(body.message.ts), request.selectedTime)
+                request.expiry = expiry
                 await client.chat.postMessage({
                     channel: botInfo.user_id,
                     text: `${SelfServeApproval.GRANT_ACCESS_MESSAGE}${JSON.stringify(request)}`,
@@ -497,7 +540,7 @@ export class SelfServeApproval extends BaseProfile {
                     text: `${SelfServeApproval.MESSAGE_TRIGGER}${JSON.stringify(request)}`,
                     post_at: expiry
                 })
-                console.log(`<@${request.requesterSlackId}> requesting access through profile _'${this.profileName}'_. Group: ${request.requestedGroupName} Duration: ${request.selectedTime} will be expired at '${expiry}'`)
+                // console.log(`<@${request.requesterSlackId}> requesting access through profile _'${this.profileName}'_. Group: ${request.requestedGroupName} Duration: ${request.selectedTime} will be expired at '${expiry}'`)
             }
 
 
@@ -507,7 +550,7 @@ export class SelfServeApproval extends BaseProfile {
             // sending all approvers the approved message
             for (const approver of approvers) {
                 try {
-                    let messageString = `<@${request.requesterSlackId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}\nReason For Request: ${reasonForRequest}.\n\`Approved By\` <@${body.user.id}>`
+                    let messageString = `<@${request.requesterSlackId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}\nReason For Request: ${reasonForRequest} \n\`Approved By\` <@${body.user.id}>`
                     msgOption = {
                         channel: approver[0],
                         ts: approver[1],
@@ -524,11 +567,22 @@ export class SelfServeApproval extends BaseProfile {
                     }
                     await client.chat.update(msgOption)
                 } catch(e) {
-                    console.log(e)
+                    logger.error(e)
                 }
             }
-            logger.info(`User '${request.requesterEmail}' request to group _'${request.requestedGroupName}'_ with duration _'${request.selectedTime}'_through profile _'${this.profileName}'_ has been approved by ${body.user.id}.`)
 
+
+            // // console.log(`User '${request.requesterEmail}' request to group _'${request.requestedGroupName}'_ with duration _'${request.selectedTime}'_ through profile _'${this.profileName}'_ has been approved by ${body.user.id}.`)
+            // request.status = "Approved"
+            // const requestObj = (({ approverMessages, ...o }) => o)(request)
+            // // logger.info(`User '${request.requesterEmail}' request to group _'${request.requestedGroupName}'_ with duration _'${request.selectedTime}'_through profile _'${this.profileName}'_ has been rejected by ${body.user.id}.`)
+            // console.log(JSON.stringify(requestObj))
+
+
+            const requestObj = (({ approverMessages, requestId, ...o }) => o)(request)
+            // logger.info(`User '${request.requesterEmail}' request to group _'${request.requestedGroupName}'_ with duration _'${request.selectedTime}'_through profile _'${this.profileName}'_ has been rejected by ${body.user.id}.`)
+            requestObj.status = "Access Granted"
+            console.log(JSON.stringify(requestObj))
 
             // sending group change message to requester
             let messageString = `Access request through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\n\`Your access will expire in ${request.selectedTime}\`\n\`Approved By\` <@${body.user.id}> \n _Note: Group changes will be passed to any connected clients automatically without the need to disconnect and reconnect and this process can take ~20 seconds to pass through to connected clients._`
@@ -574,7 +628,7 @@ export class SelfServeApproval extends BaseProfile {
         })
 
         // approver message
-        let messageString = `<@${request.requesterSlackId}> profile _'${this.profileName}'_ access expired.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}\nReason For Request: ${request.reasonForRequest}.\nApproved By <@${request.approverSlackId}>\n\`Access Expired\``
+        let messageString = `<@${request.requesterSlackId}> profile _'${this.profileName}'_ access expired.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}\nReason For Request: ${request.reasonForRequest} \nApproved By <@${request.approverSlackId}>\n\`Access Expired\``
         let msgOption = {
             channel: request.approverSlackId,
             text: messageString,
@@ -588,7 +642,15 @@ export class SelfServeApproval extends BaseProfile {
                 }
             ]
         }
-        await client.chat.postMessage(msgOption)
+        try {
+            await client.chat.postMessage(msgOption)
+        } catch(e) {
+            logger.error(e)
+        }
+
+        const requestObj = (({ requestId, ...o }) => o)(request)
+        requestObj.status = "Access Expired"
+        console.log(JSON.stringify(requestObj))
 
         if (request.approverSlackId === request.requesterSlackId) return
 
@@ -607,9 +669,12 @@ export class SelfServeApproval extends BaseProfile {
                 }
             ]
         }
-        await client.chat.postMessage(msgOption)
 
-        console.log(`User ${request.requesterEmail} profile _'${this.profileName}'_ access expired. Group: ${request.requestedGroupName} Duration: ${request.selectedTime}`)
+        try {
+            await client.chat.postMessage(msgOption)
+        } catch(e) {
+            logger.error(e)
+        }
 
     }
 

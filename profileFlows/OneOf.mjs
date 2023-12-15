@@ -1,5 +1,6 @@
 import {SlackProfileManager} from "../SlackProfileManager.mjs";
 import {BaseProfile} from "./BaseProfile.mjs";
+import {v4 as uuidv4} from "uuid";
 
 export class OneOfProfile extends BaseProfile {
     constructor(app, profileConfig, index) {
@@ -13,7 +14,7 @@ export class OneOfProfile extends BaseProfile {
         app.view(`submit_profile-${index}`, this.submitProfileChange.bind(this));
     }
 
-    async getAppHomeBlock(tgUser) {
+            async getAppHomeBlock(tgUser) {
         const userGroupNames = tgUser.groups.map(group => group.name);
         const currentActiveGroups = this.groups.filter(group => userGroupNames.includes(group))
         let currentActiveGroupsString = currentActiveGroups.join(", ")
@@ -116,7 +117,17 @@ export class OneOfProfile extends BaseProfile {
 
             await this.app.refreshHome(body.user.id, tgUser.email);
 
-            logger.info(`User '${tgUser.email}' changed profile '${this.profileName}' to group '${selectedGroup}'`)
+            const request = {
+                requestedProfile: this.profileName,
+                requestedProfileType: this.profileType,
+                requesterTwingateId: tgUser.id,
+                requesterEmail: tgUser.email,
+                newGroup: selectedGroup,
+                status: "Success"
+            }
+
+            // logger.info(`User '${tgUser.email}' changed profile '${this.profileName}' to group '${selectedGroup}'`)
+            console.log(JSON.stringify(request))
         } catch (error) {
             logger.error(error);
         }
@@ -131,19 +142,19 @@ export class OneOfProfile extends BaseProfile {
         ;
 
         if (groupNamesToRemove.length > 0) {
-            console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - removing group(s): ${groupNamesToRemove.map(g=>`'${g}'`).join(", ")}.`);
+            // console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - removing group(s): ${groupNamesToRemove.map(g=>`'${g}'`).join(", ")}.`);
             const groupsIdsToRemove = await Promise.all(groupNamesToRemove.map(groupName => profileManager.lookupGroupByName(groupName)));
             await Promise.all(groupsIdsToRemove.map(groupId => profileManager.removeUserFromGroup(groupId, tgUser.id)));
         } else {
-            console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - no groups to remove.`);
+            // console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - no groups to remove.`);
         }
 
         if (typeof selectedGroup === "string" && !userGroupNames.includes(selectedGroup)) {
-            console.log(`User '${tgUser.email}' in profile '${this.profileName}' - adding group: ${selectedGroup}.`);
+            // console.log(`User '${tgUser.email}' in profile '${this.profileName}' - adding group: ${selectedGroup}.`);
             const groupId = await profileManager.lookupGroupByName(selectedGroup);
             await profileManager.addUserToGroup(groupId, tgUser.id)
         } else {
-            console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - no group to add.`);
+            // console.log(`User '${tgUser.email}' in profile '${this.profileName}' with selected group '${selectedGroup}' - no group to add.`);
         }
 
         // sending group change message to user

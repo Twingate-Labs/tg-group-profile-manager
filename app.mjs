@@ -107,7 +107,7 @@ async function initApp(app) {
         try {
             const slackUserInfo = await client.users.info({user: event.user});
             await refreshHome(event.user, slackUserInfo.user.profile.email);
-            logger.info(`${event.user} opened app home.`)
+            // logger.info(`${event.user} opened app home.`)
         } catch (error) {
             logger.error(error);
         }

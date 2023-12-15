@@ -10,7 +10,7 @@ This object defines a single profile
 - _profileType_: Enum, only `oneOf` and `selfServeApproval` supported currently. _Default_: `oneOf`
 - _applicableToGroup_: String, a Twingate group that a user must be in for them to see this profile. _Default_: "Everyone"
 - _approverGroup_: String, `selfServerApproval` specific, a Twingate group a user must be in for them to approve the access request of the Profile. The group size should not exceed 20 members. _Required_.
-- _timeOptions_: Enum, `selfServerApproval` specific, the duration options requesters can select during access request. Must be one of `Forever`, `1h`, `8h`, `24h`, `7d`, `30d`, `90d`. _Default_: `[Forever]`
+- _timeOptions_: Enum, `selfServerApproval` specific, the duration options requesters can select during access request. Must be one of `Forever`, `1h`, `2h`, `4h`, `6h`, `8h`, `12h`, `24h`, `2d`, `3d`,`4d`, `5d`, `6d`, `7d`, `14d`,`21d`,`30d`, `60d`, `90d`. _Default_: `[Forever]`
 - _groups_: 
   - _oneOf_: List of String, Twingate groups within the profile which the users can switch between. _Required_.
   - _selfServeApproval_: List of String, Twingate groups within the profile which the users can request access to. _Required_
