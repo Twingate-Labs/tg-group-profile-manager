@@ -302,7 +302,7 @@ export class SelfServeApproval extends BaseProfile {
 
 
             // approver slack message
-            let messageString = `<@${slackUserId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${selectedGroup}\nDuration: ${selectedTime}(start from the time of approval)\nReason For Request: ${reasonForRequest}`
+            let messageString = `<@${slackUserId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${selectedGroup}\nDuration: ${selectedTime} (Start from the time of approval)\nReason For Request: ${reasonForRequest}`
             msgOption = {
                 channel: approverSlackInfo.user.id,
                 text: messageString,
@@ -410,7 +410,7 @@ export class SelfServeApproval extends BaseProfile {
         }
 
         // requester slack message
-        let messageString = `Group access request through profile _'${this.profileName}'_ has been sent.\nGroup: ${selectedGroup}\nDuration: ${selectedTime}(start from the time of approval)\nA new Slack message will be sent to you once the request is approved/rejected.`
+        let messageString = `Group access request through profile _'${this.profileName}'_ has been sent.\nGroup: ${selectedGroup}\nDuration: ${selectedTime} (Start from the time of approval)\nA new Slack message will be sent to you once the request is approved/rejected.`
         msgOption = {
             channel: slackUserId,
             text: messageString,
@@ -477,7 +477,7 @@ export class SelfServeApproval extends BaseProfile {
             // sending all approvers the rejected message
             for (const approver of approvers) {
                 try {
-                    let messageString = `<@${request.requesterSlackId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}(start from the time of approval)\nReason For Request: ${reasonForRequest} \n\`Rejected By\` <@${body.user.id}>`
+                    let messageString = `<@${request.requesterSlackId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime} (Start from the time of approval)\nReason For Request: ${reasonForRequest} \n\`Rejected By\` <@${body.user.id}>`
                     msgOption = {
                         channel: approver[0],
                         ts: approver[1],
@@ -504,7 +504,7 @@ export class SelfServeApproval extends BaseProfile {
             console.log(JSON.stringify(requestObj))
 
             // sending rejected message to requester
-            let messageString = `Access request through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}(start from the time of approval)\n\`Rejected By\` <@${body.user.id}>`
+            let messageString = `Access request through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime} (Start from the time of approval)\n\`Rejected By\` <@${body.user.id}>`
             msgOption = {
                 channel: request.requesterSlackId,
                 text: messageString,
@@ -550,7 +550,7 @@ export class SelfServeApproval extends BaseProfile {
             // sending all approvers the approved message
             for (const approver of approvers) {
                 try {
-                    let messageString = `<@${request.requesterSlackId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}(start from the time of approval)\nReason For Request: ${reasonForRequest} \n\`Approved By\` <@${body.user.id}>`
+                    let messageString = `<@${request.requesterSlackId}> is requesting access through profile _'${this.profileName}'_.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime} (Start from the time of approval)\nReason For Request: ${reasonForRequest} \n\`Approved By\` <@${body.user.id}>`
                     msgOption = {
                         channel: approver[0],
                         ts: approver[1],
@@ -628,7 +628,7 @@ export class SelfServeApproval extends BaseProfile {
         })
 
         // approver message
-        let messageString = `<@${request.requesterSlackId}> profile _'${this.profileName}'_ access expired.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}(start from the time of approval)\nReason For Request: ${request.reasonForRequest} \nApproved By <@${request.approverSlackId}>\n\`Access Expired\``
+        let messageString = `<@${request.requesterSlackId}> profile _'${this.profileName}'_ access expired.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime} (Start from the time of approval)\nReason For Request: ${request.reasonForRequest} \nApproved By <@${request.approverSlackId}>\n\`Access Expired\``
         let msgOption = {
             channel: request.approverSlackId,
             text: messageString,
@@ -655,7 +655,7 @@ export class SelfServeApproval extends BaseProfile {
         if (request.approverSlackId === request.requesterSlackId) return
 
         // requester message
-        messageString = `Profile _'${this.profileName}'_ access expired.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime}(start from the time of approval)\nApproved By <@${request.approverSlackId}>\n\`Access Expired\``
+        messageString = `Profile _'${this.profileName}'_ access expired.\nGroup: ${request.requestedGroupName}\nDuration: ${request.selectedTime} (Start from the time of approval)\nApproved By <@${request.approverSlackId}>\n\`Access Expired\``
         msgOption = {
             channel: request.requesterSlackId,
             text: messageString,
