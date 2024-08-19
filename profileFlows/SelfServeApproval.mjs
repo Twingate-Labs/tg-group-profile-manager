@@ -527,7 +527,7 @@ export class SelfServeApproval extends BaseProfile {
             let expiry = "Forever"
             if (request.selectedTime !== "Forever") {
                 request.approverSlackId = body.user.id
-                expiry = this.durationParser(Math.round(body.message.ts), request.selectedTime)
+                expiry = this.durationParser(Math.round(Date.now()/1000), request.selectedTime)
                 request.expiry = expiry
                 await client.chat.postMessage({
                     channel: botInfo.user_id,
