@@ -187,7 +187,7 @@ async function initApp(app) {
 
     await initApp(app);
 
-    await app.start(port);
+    await app.start(process.env.PORT || port);
     console.log(`⚡️ Slack Bolt app is running on port ${port}!`);
     console.log(`Healthcheck endpoint available at http://localhost:${port}/healthcheck`);
 
