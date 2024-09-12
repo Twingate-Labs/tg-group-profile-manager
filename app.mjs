@@ -172,13 +172,24 @@ async function initApp(app) {
     const app = new App({
         token: slackToken,
         signingSecret: slackSigningSecret,
-        ignoreSelf: false
+        ignoreSelf: false,
+        customRoutes: [
+            {
+                path: '/healthcheck',
+                method: ['GET'],
+                handler: (req, res) => {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ status: 'OK' }));
+                },
+            },
+        ],
     });
+
     await initApp(app);
 
     await app.start(process.env.PORT || port);
     console.log(`⚡️ Slack Bolt app is running on port ${port}!`);
-
+    console.log(`Healthcheck endpoint available at http://localhost:${port}/healthcheck`);
     // todo: confirm the block below is not preventing the bot to accept event in Cloudrun without no cpu throttling
     console.log(`Checking all expired duration based accesses are revoked.`)
     await startUpCleanUp(app)
