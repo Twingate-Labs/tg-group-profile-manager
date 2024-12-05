@@ -28,7 +28,7 @@ Profiles can be configured in JSON and access to each profile can be restricted 
 
 ### Configuration
 Please prepare the following configuration parameters (refer to the [example file](./tg-group-profile-manager.conf)):
- - `SLACK_SECRET` Slack signing secret
+ - `SLACK_SIGNING_SECRET` Slack signing secret
  - `SLACK_BOT_TOKEN` Slack bot token (begins with `xoxb-`)
  - `TG_API_KEY` can be generated in the Setting page within the Twingate Admin Console (Read and Write permission is required)
  - `TG_ACCOUNT` replace with your Twingate Network Address (e.g. _test1.twingate.com_)
